@@ -18,6 +18,8 @@ Build 19.7 expands the SK1 tutorial with all six supported programmable short-pr
 
 Build 19.8 retains normal number-key entry instructions for 0 and 8 and puts their hold functions under a larger Longpress heading. MENU, * and # also separate short-press instructions from documented hold functions. Radio behavior is unchanged.
 
+Build 20.1 builds on the maintainer’s v20.0 help revisions. It standardizes Key / Short Press / Long Press typography; explains all six hold shortcuts; corrects # to the user-reported DTMF dialing behavior with its transmission warning; expands reverse/talkaround, frequency search and SK1 activation-tone guidance. The guide is display-only. Radio programming behavior and all safety restrictions remain unchanged.
+
 ⚠ **Experimental Software — Radio Damage Risk**
 
 Programming errors, software defects, or interrupted communication may render your radio inoperable. Always maintain a backup dat for use with official CPS and programming cable.

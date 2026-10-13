@@ -23,12 +23,12 @@ test('single-screen safety controls, read/write locks, reset prompt, idle timeou
   get('help').click();
   const diagramButtons=get('content').querySelectorAll('button').filter(b=>b.dataset.radioKey);
   const tutorialPanel=get('content').querySelectorAll('section').find(s=>s.id==='radioTutorialPanel');
-  const tutorialText=()=>tutorialPanel.querySelectorAll('h3').map(e=>e.textContent).join(' ');
+  const tutorialText=()=>[...tutorialPanel.querySelectorAll('h3'),...tutorialPanel.querySelectorAll('h4')].map(e=>e.textContent).join(' ');
   assert.equal(diagramButtons.length,23);
-  diagramButtons.find(b=>b.dataset.radioKey==='0').onmouseenter();assert.match(tutorialText(),/Number keys — frequency and channel entry/);assert.match(tutorialText(),/Long Press – Weather/);assert.ok(tutorialPanel.querySelectorAll('li').some(e=>e.textContent.includes('enter weather mode')));
-  diagramButtons.find(b=>b.dataset.radioKey==='8').click();assert.match(tutorialText(),/Number keys — frequency and channel entry/);assert.match(tutorialText(),/Long Press – Power Level/);assert.ok(tutorialPanel.querySelectorAll('li').some(e=>e.textContent.includes('change transmit power')));
-  diagramButtons.find(b=>b.dataset.radioKey==='star').onfocus();assert.match(tutorialText(),/repeater functions/);assert.match(tutorialText(),/Long Press – Keypad Lock/);
-  diagramButtons.find(b=>b.dataset.radioKey==='sk1').click();assert.match(tutorialText(),/configurable side key/);assert.ok(tutorialPanel.querySelectorAll('p').some(p=>p.textContent==='Current workspace assignment: Channel scan'));
+  diagramButtons.find(b=>b.dataset.radioKey==='0').onmouseenter();assert.match(tutorialText(),/Short Press – Numeric Entry/);assert.match(tutorialText(),/Long Press – Weather/);assert.ok(tutorialPanel.querySelectorAll('li').some(e=>e.textContent.includes('enter weather mode')));
+  diagramButtons.find(b=>b.dataset.radioKey==='8').click();assert.match(tutorialText(),/Short Press – Numeric Entry/);assert.match(tutorialText(),/Long Press – Transmit Power/);assert.ok(tutorialPanel.querySelectorAll('li').some(e=>e.textContent.includes('switch between Low (L) and High (H)')));
+  diagramButtons.find(b=>b.dataset.radioKey==='star').onfocus();assert.match(tutorialText(),/Short Press – Reverse \/ Talkaround/);assert.match(tutorialText(),/Long Press – Keypad Lock/);
+  diagramButtons.find(b=>b.dataset.radioKey==='sk1').click();assert.match(tutorialText(),/Short Press – Programmable Function/);assert.ok(tutorialPanel.querySelectorAll('p').some(p=>p.textContent==='Current workspace assignment: Channel scan'));
   assert.equal(connections.length,0);assert.equal(get('writeRadio').disabled,true);
   get('tabs').querySelectorAll('button').find(b=>b.textContent.includes('Channels')).click();
 
@@ -50,4 +50,40 @@ test('single-screen safety controls, read/write locks, reset prompt, idle timeou
   add();enter('rxFreq','147');get('apply').click();get('save').click();edited=readDat(new Uint8Array(await download.arrayBuffer()),schemas);assert.equal(edited.channelList[0][3].rxFreq,'147.00000');assert.equal(edited.channelList[0][3].txFreq,'');
   add();enter('rxFreq','146.520001');get('apply').click();assert.equal(get('editor').open,true);assert.match(get('editErrors').textContent,/five decimal places/);get('cancel').click();
  }finally{Writer.prototype.connect=originalConnect;delete globalThis.document;}
+});
+
+test('radio guide separates all six hold actions and preserves the DTMF transmission warning',()=>{
+ class GuideElement{
+  constructor(tag){this.tag=tag;this.children=[];this.dataset={};this.style={};this.classList={toggle(){}};}
+  append(...items){this.children.push(...items);}replaceChildren(...items){this.children=items;}setAttribute(key,value){this[key]=value;}
+  querySelectorAll(tag){return this.children.filter(x=>x instanceof GuideElement).flatMap(x=>[...(x.tag===tag?[x]:[]),...x.querySelectorAll(tag)]);}
+ }
+ const previousDocument=globalThis.document;globalThis.document={createElement:tag=>new GuideElement(tag)};
+ const textOf=node=>typeof node==='string'?node:[node.textContent||'',...node.children.map(textOf)].join(' ');
+ try{
+  const root=new GuideElement('main'),choices=JSON.parse(fs.readFileSync(new URL('../function-options.json',import.meta.url))).key2Short;
+  renderRadioTutorial(root,{key2Short:7},choices);
+  const buttons=root.querySelectorAll('button'),panel=root.querySelectorAll('section').find(x=>x.id==='radioTutorialPanel');
+  assert.equal(buttons.length,23);
+  const select=key=>buttons.find(b=>b.dataset.radioKey===key).onclick();
+  const headings=()=>panel.querySelectorAll('h4').map(x=>x.textContent);
+  const expected={
+   star:['Key: *','Short Press – Reverse / Talkaround','Long Press – Keypad Lock',/Normal → Reverse \(R\) → Talkaround \(T\) → Normal/],
+   '8':['Key: 8','Short Press – Numeric Entry','Long Press – Transmit Power',/Keeping 8 held does not continuously cycle power levels/],
+   hash:['Key: #','Short Press – DTMF Dial','Long Press – Channel Scan',/Scan resume behavior/],
+   lamp:['Key: Flashlight / Search','Short Press – Flashlight','Long Press – Frequency Search (Nearby Signal Detection)',/not a spectrum analyzer or a conventional channel scanner/],
+   '0':['Key: 0','Short Press – Numeric Entry','Long Press – Weather',/weather-channel scanning/],
+   menu:['Key: MENU','Short Press – Menu / Confirm','Long Press – Stopwatch',/Press MENU to start timing/]
+  };
+  for(const [key,[title,short,long,description]]of Object.entries(expected)){
+   select(key);assert.deepEqual(panel.querySelectorAll('h3').map(x=>x.textContent),[title]);assert.deepEqual(headings(),[short,long]);assert.match(textOf(panel),description);
+   assert.ok(panel.querySelectorAll('h4').every(h=>h.className==='tutorial-action-title'));
+  }
+  select('hash');const dtmf=textOf(panel);
+  assert.match(dtmf,/PTT exits the screen even if no digits were entered/);assert.match(dtmf,/EXIT does not cancel the screen/);assert.match(dtmf,/No method of exiting without transmitting has been confirmed/);assert.match(dtmf,/not been independently verified with a receiving radio/);
+  const warning=panel.querySelectorAll('p').find(p=>p.className==='tutorial-warning');assert.equal(warning.role,'note');assert.match(warning.textContent,/PTT initiates transmission/);assert.doesNotMatch(dtmf,/FM.*station search/i);
+  select('lamp');const search=textOf(panel);assert.match(search,/# switches the search band between VHF and UHF/);assert.match(search,/attempts to identify/);assert.match(search,/MENU saves/);assert.match(search,/overwrite procedure has not been confirmed/);
+  select('sk1');assert.deepEqual(headings(),['Short Press – Programmable Function','PTT + SK1 – Repeater Activation Tone']);assert.equal(panel.querySelectorAll('strong').length,6);assert.match(textOf(panel),/Current workspace assignment: FM broadcast radio/);assert.match(textOf(panel),/1000, 1450, 1750 and 2100 Hz/);assert.match(textOf(panel),/not been physically verified/);assert.match(textOf(panel),/may sound locally or transmit/);
+  for(const key of ['ptta','pttb','vm','ab','up','down','exit','1','2','3','4','5','6','7','9']){select(key);assert.ok(!headings().some(h=>h.startsWith('Long Press')),'Unexpected hold action: '+key);}
+ }finally{if(previousDocument===undefined)delete globalThis.document;else globalThis.document=previousDocument;}
 });
