@@ -28,6 +28,8 @@ Build 20.4 simplifies the button tutorials by removing the SK1 workspace/diagram
 
 Build 20.5 / 20.6 adds a compact Channels popup for built-in service presets and native DAT channel appends. It previews next available consecutive slots or fully empty 101–901 blocks, skips matching channels by default, preserves all existing channels/settings and supports Undo. Presets include receive/transmit frequencies and offer the existing High/Low power choices with service notices. Actual output power and equipment eligibility require verification. The full radio-write process is unchanged.
 
+Build 20.7 opens the channel editor when a row is clicked or activated with Enter. Checkboxes, action buttons and dragging retain their own behavior. The channel table preserves vertical/horizontal scroll through edits, selection and deletion, and returns focus to a nearby row without jumping to channel 1. Radio programming behavior is unchanged.
+
 ⚠ **Experimental Software — Radio Damage Risk**
 
 Programming errors, software defects, or interrupted communication may render your radio inoperable. Always maintain a backup dat for use with official CPS and programming cable.
