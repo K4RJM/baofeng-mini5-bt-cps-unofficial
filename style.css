@@ -44,3 +44,27 @@ main{padding-top:12px}
 @media(max-width:1000px){.radio-tutorial-layout{grid-template-columns:250px minmax(0,1fr);gap:14px}.radio-drawing{width:250px}.radio-tutorial-panel{padding:14px}}
 @media(max-width:750px){.radio-tutorial-layout{grid-template-columns:minmax(0,1fr)}.radio-drawing{width:300px}.radio-tutorial-panel{min-height:0}.radio-key{font-size:10px}}
 @media(max-width:750px){.workspace-head{gap:8px}.workspace-head h2{font-size:19px}.workspace-head p{font-size:11px}.workspace-head .tag{font-size:10px;padding:4px 6px}}
+
+/* Compact channel-append dialog. */
+dialog#appendDialog{width:min(680px,94vw);padding:22px}
+#appendDialog h2{font-size:22px;margin:2px 0 0}
+.append-eyebrow{display:block;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:1.2px}
+.append-intro{font-size:13px;margin:10px 0 18px}
+.append-fields{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px}
+.append-fields select{font-size:12px;padding:10px}
+#appendDatField{margin-top:12px}
+#appendDat{padding:8px;max-width:100%;font-size:12px}
+.append-checks{display:flex;align-items:center;flex-wrap:wrap;gap:10px 18px;margin:14px 0}
+.append-transmit{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
+.append-power{flex-shrink:0;width:100px;margin-left:auto}
+.append-power select{padding:6px 9px;font-size:12px}
+.append-notice{padding:12px 14px;background:var(--raised);border:1px solid var(--border);border-left:3px solid #d7a750;border-radius:8px;font-size:12px}
+.append-notice strong{color:var(--text)}
+.append-notice p{margin:6px 0;font-size:12px;line-height:1.45}
+.append-notice a{display:inline-block;font-size:11px}
+.append-preview{display:grid;gap:4px;padding:12px 14px;margin-top:14px;background:var(--selected);border:1px solid color-mix(in srgb,var(--blue) 30%,var(--border));border-radius:8px}
+.append-preview strong{font-size:16px}.append-preview>span:last-child{font-size:12px;color:var(--muted)}
+#appendErrors{margin:10px 0 0;font-size:12px}
+.append-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px}
+.append-footer>span{color:var(--muted);font-size:11px}.append-footer>div{display:flex;gap:8px}.append-footer button{font-size:12px}
+@media(max-width:480px){dialog#appendDialog{padding:18px}.append-fields{grid-template-columns:minmax(0,1fr)}.append-checks{gap:10px}.append-transmit{gap:10px}.append-transmit .check{font-size:11px}.append-footer{align-items:flex-start;flex-direction:column;gap:12px}.append-footer>div{align-self:flex-end}}

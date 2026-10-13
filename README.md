@@ -26,6 +26,8 @@ Build 20.3 removes the redundant SK1 assignment-list heading. The six descriptio
 
 Build 20.4 simplifies the button tutorials by removing the SK1 workspace/diagram notes, repetitive DTMF paragraphs, number-key assignment note, power/workspace note and flashlight/search note. Help uses direct wording. Operating steps, six SK1 functions and steady panel height remain; radio programming behavior is unchanged.
 
+Build 20.5 adds a compact Channels popup for built-in service presets and native DAT channel appends. It previews next available consecutive slots or fully empty 101–901 blocks, skips matching channels by default, preserves all existing channels/settings and supports Undo. Presets include receive/transmit frequencies and offer the existing High/Low power choices with service notices. Actual output power and equipment eligibility require verification. The full radio-write process is unchanged.
+
 ⚠ **Experimental Software — Radio Damage Risk**
 
 Programming errors, software defects, or interrupted communication may render your radio inoperable. Always maintain a backup dat for use with official CPS and programming cable.
