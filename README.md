@@ -10,6 +10,8 @@ Build 19.3 adds Help guidance that only native CPS DAT files are supported and e
 
 Build 19.4 adds K4RJM's GitHub profile and QRZ callsign links below the developer credit. Both open in a new tab.
 
+Build 19.5 adds expandable feature guides on the editing screens and a Help walkthrough covering files, channels, optional settings, VFOs and DTMF. It distinguishes signaling-code groups from channel groups, explains the radio’s built-in weather button, and marks unavailable presets and RepeaterBook import. Radio programming behavior is unchanged.
+
 ⚠ **Experimental Software — Radio Damage Risk**
 
 Programming errors, software defects, or interrupted communication may render your radio inoperable. Always maintain a backup dat for use with official CPS and programming cable.
