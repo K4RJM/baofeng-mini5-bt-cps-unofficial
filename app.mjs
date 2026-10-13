@@ -2,7 +2,7 @@ import {readDat,writeDat} from './dat.mjs';
 import {validateEdits} from './validation.mjs';
 import {Writer,makePlan,verificationMessage} from './writer.mjs';
 import {decodeRadio,radioDat} from './radio-decoder.mjs';
-import {renderRadioTutorial} from './radio-help.mjs?v=19.9';
+import {renderRadioTutorial} from './radio-help.mjs?v=20.0';
 import {blankData,emptyChannel,removeChannels,insertChannel,moveChannel} from './channels.mjs';
 import {configureFields,form,optionalForm,vfoForm,visibleName,visibleTone,editedName,isFrequencyField,padFrequency} from './fields.mjs?v=19.1';
 const $=id=>document.getElementById(id),radio=new Writer();
