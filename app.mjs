@@ -2,8 +2,8 @@ import {readDat,writeDat} from './dat.mjs';
 import {validateEdits} from './validation.mjs';
 import {Writer,makePlan,verificationMessage} from './writer.mjs';
 import {decodeRadio,radioDat} from './radio-decoder.mjs';
-import {openChannelAppend} from './channel-import-ui.mjs?v=20.5';
-import {renderRadioTutorial} from './radio-help.mjs?v=20.5';
+import {openChannelAppend} from './channel-import-ui.mjs?v=20.6';
+import {renderRadioTutorial} from './radio-help.mjs?v=20.6';
 import {blankData,emptyChannel,removeChannels,insertChannel,moveChannel} from './channels.mjs';
 import {configureFields,form,optionalForm,vfoForm,visibleName,visibleTone,editedName,isFrequencyField,padFrequency} from './fields.mjs?v=19.1';
 const $=id=>document.getElementById(id),radio=new Writer();
@@ -105,7 +105,7 @@ function renderChannels(c){
 function openAppend(mode){
  if(busy||!trustedBase)throw Error('Read your radio or open a native CPS .dat first.');
  openChannelAppend({mode,getData:()=>data,readFile:async file=>readDat(await file.arrayBuffer(),schemas),onApply:(candidate,plan)=>{
-  commit(candidate);search='';showEmpty=false;page=Math.floor(candidate.channelList[0].slice(0,plan.start-1).filter(c=>c.rxFreq).length/pageSize);render();workspaceStatus();message(plan.channels.length+' channels added to '+plan.start+'–'+plan.end+'. Existing channels and radio settings preserved. Save a .dat copy or review before Write radio.');
+  commit(candidate);search='';showEmpty=false;page=Math.floor(candidate.channelList[0].slice(0,plan.start-1).filter(c=>c.rxFreq).length/pageSize);render();workspaceStatus();message(plan.channels.length+(plan.channels.length===1?' channel':' channels')+' added to '+(plan.start===plan.end?plan.start:plan.start+'–'+plan.end)+'. Existing channels and radio settings preserved. Save a .dat copy or review before Write radio.');
  }});
 }
 function edit(i,insert=false){

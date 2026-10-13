@@ -1,4 +1,4 @@
-import {PRESETS,presetChannels,datChannels,planAppend,blockAvailability,appendChannels} from './channel-import.mjs';
+import {PRESETS,presetChannels,datChannels,planAppend,blockAvailability,appendChannels} from './channel-import.mjs?v=20.6';
 const $=id=>document.getElementById(id);
 const option=(value,label,disabled=false)=>{const el=document.createElement('option');el.value=String(value);el.textContent=label;el.disabled=disabled;return el;};
 let generation=0;
@@ -20,10 +20,10 @@ export function openChannelAppend({mode='preset',getData,readFile,onApply}){
   $('appendPlacement').value=selected;
   const plan=planAppend(current,list,preferences());
   $('appendNoticeTitle').textContent=isDat?'Keep the current radio configuration':preset.key==='shared'&&$('appendRepeaters').checked?'USA · FRS / GMRS + repeater pairs':preset.label.split(' · ').at(-1)+' · '+preset.label.split(' · ')[0];
-  $('appendNoticeText').textContent=isDat?'Only populated channels are copied. Current optional settings, VFOs, DTMF and the extra file record stay unchanged. Imported transmit frequencies and power settings are preserved.':preset.notice+(preset.key==='shared'&&$('appendRepeaters').checked?' Repeater pairs need a GMRS license and the correct access tone.':'');
-  $('appendPowerNote').hidden=isDat;$('appendPowerNote').textContent='Before transmitting, check local regulations, licensing and equipment requirements. Stay within permitted power limits; High / Low settings do not guarantee a particular wattage.';
+  $('appendNoticeText').textContent=isDat?'Only populated channels are copied. Current optional settings, VFOs, DTMF and the extra file record stay unchanged. Imported transmit frequencies and power settings are preserved.':preset.notice+(preset.key==='shared'&&$('appendRepeaters').checked?' Set repeater access tones.':'');
+  $('appendPowerNote').hidden=isDat;$('appendPowerNote').textContent='Before transmitting, check local regulations, licensing and equipment approval. High / Low settings do not guarantee these power limits.';
   $('appendRules').hidden=isDat;$('appendRules').href=preset.rules;
-  $('appendRange').textContent=loading?'Reading native CPS file…':isDat&&!imported?'Choose a .dat file to preview placement':plan.error?'No channels will be added':`${plan.channels.length} channels → ${plan.start}–${plan.end}`;
+  $('appendRange').textContent=loading?'Reading native CPS file…':isDat&&!imported?'Choose a .dat file to preview placement':plan.error?'No channels will be added':`${plan.channels.length} channel${plan.channels.length===1?'':'s'} → ${plan.start===plan.end?plan.start:plan.start+'–'+plan.end}`;
   $('appendCounts').textContent=loading||isDat&&!imported?'Existing channels stay in place.':`${plan.duplicates} matching channels skipped · existing channels preserved`;
   $('appendErrors').textContent=fileError||(!loading&&(!isDat||imported)?plan.error:'');$('appendErrors').hidden=!$('appendErrors').textContent;
   $('appendApply').disabled=loading||!!fileError||!!plan.error||isDat&&!imported;

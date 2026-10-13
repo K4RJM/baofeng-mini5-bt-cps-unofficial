@@ -68,3 +68,5 @@ dialog#appendDialog{width:min(680px,94vw);padding:22px}
 .append-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px}
 .append-footer>span{color:var(--muted);font-size:11px}.append-footer>div{display:flex;gap:8px}.append-footer button{font-size:12px}
 @media(max-width:480px){dialog#appendDialog{padding:18px}.append-fields{grid-template-columns:minmax(0,1fr)}.append-checks{gap:10px}.append-transmit{gap:10px}.append-transmit .check{font-size:11px}.append-footer{align-items:flex-start;flex-direction:column;gap:12px}.append-footer>div{align-self:flex-end}}
+
+@media(max-width:480px){#appendDialog .append-intro{margin:8px 0 12px}#appendDialog .append-fields{gap:10px}#appendDialog .append-checks{margin:10px 0;gap:8px}#appendDialog .append-notice{padding:10px 12px}#appendDialog .append-preview{margin-top:10px;padding:10px 12px}#appendDialog .append-footer{margin-top:12px;gap:8px}}

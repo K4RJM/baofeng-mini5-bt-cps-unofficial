@@ -1,7 +1,7 @@
 // Workspace channel operations only. No transport or programming commands.
 import {CAPACITY,emptyChannel} from './channels.mjs';
 export const PRESETS=[
- {key:'shared',label:'FRS / GMRS shared · 22 channels · USA',notice:'FRS: 2 W ERP on 1–7 and 15–22; 0.5 W on 8–14. GMRS: 5 W ERP on 1–7; 0.5 W on 8–14; up to 50 W output for mobile/base operation on 15–22. Use service-approved equipment; GMRS requires a license.',rules:'https://www.ecfr.gov/current/title-47/section-95.567'},
+ {key:'shared',label:'FRS / GMRS shared · 22 channels · USA',notice:'FRS: 1–7 & 15–22 ≤2 W ERP; 8–14 ≤0.5 W. GMRS: 1–7 ≤5 W ERP; 8–14 ≤0.5 W; 15–22 ≤50 W output (mobile/base). Approved equipment required; GMRS requires a license.',rules:'https://www.ecfr.gov/current/title-47/section-95.567'},
  {key:'gmrs',label:'GMRS repeater pairs · 8 channels · USA',notice:'GMRS requires a license and certified equipment. These pairs receive on 462 MHz and transmit 5 MHz higher. Set the repeater’s access tone before transmitting.',rules:'https://www.ecfr.gov/current/title-47/section-95.1763'},
  {key:'murs',label:'MURS · 5 channels · USA',notice:'US MURS permits up to 2 W transmitter output with approved MURS equipment. No individual license is required. These presets use narrow FM.',rules:'https://www.ecfr.gov/current/title-47/section-95.2767'},
  {key:'pmr',label:'PMR446 · 16 channels · Europe',notice:'PMR446 requires compliant handheld equipment with an integral antenna and at most 0.5 W ERP. Check local rules; an amateur-radio license does not authorize PMR446 transmission.',rules:'https://www.ofcom.org.uk/siteassets/resources/documents/manage-your-licence/business-radio/business-radio-guidance/ir_2009_analogue_and_digita1.pdf'}
