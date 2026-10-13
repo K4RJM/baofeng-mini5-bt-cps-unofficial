@@ -1,5 +1,12 @@
 let functionOptions,editorOptions,onChange;
 export function configureFields(f,e,changed){functionOptions=f;editorOptions=e;onChange=changed;}
+export const isFrequencyField=k=>['rxFreq','txFreq','vfoAFreq','vfoBFreq'].includes(k);
+// Add only missing decimal zeros. Never round, truncate, or invent a frequency.
+export function padFrequency(value){
+ const trimmed=value.trim();if(!trimmed)return '';
+ const match=/^(\d{3})(?:\.(\d{0,5}))?$/.exec(trimmed);
+ return match?`${match[1]}.${(match[2]||'').padEnd(5,'0')}`:value;
+}
 const labels={sql:'Squelch',saveMode:'Battery saving',voxSw:'Voice-activated transmit',vox:'VOX sensitivity',voxDlyTime:'VOX release delay',dualStandby:'Dual watch',tot:'Transmit time limit',beep:'Keypad beep',sideTone:'DTMF sound in speaker',scanMode:'Scan resume behavior',pttDly:'PTT ID delay',chADisType:'Upper display mode',chBDisType:'Lower display mode',autoLock:'Automatic keypad lock',voice:'Spoken prompts',alarmMode:'Alarm mode',alarmTone:'Alarm sound',tailClear:'Squelch tail suppression',rptTailClear:'Repeater tail suppression',rptTailDet:'Repeater tail delay',roger:'End-of-transmission beep',fmEnable:'FM broadcast receiver',chAWorkmode:'Upper channel/frequency mode',chBWorkmode:'Lower channel/frequency mode',keyLock:'Keypad lock',powerOnDisType:'Startup display',tone:'Repeater access tone',backlight:'Screen backlight',menuQuitTime:'Menu exit delay',language:'Prompt language',rstMenu:'Reset menu',totAlarm:'Transmit timeout warning',ctsDcsScanType:'Tone scan mode',key2Short:'Side-key short press',rxFreq:'Receive frequency (MHz)',txFreq:'Transmit frequency (MHz)',name:'Channel name',strRxCtsDcs:'Receive tone',strTxCtsDcs:'Transmit tone',busyLock:'Busy-channel transmit lock',txPower:'Transmit power',bandwide:'Channel bandwidth',scanAdd:'Include in scan',sqMode:'Squelch mode',pttid:'PTT identification',signalGroup:'DTMF group',fhss:'Frequency hopping',localID:'Own DTMF ID',wordTime:'DTMF tone duration',idleTime:'DTMF pause duration',hangUp:'DTMF call hold time',separator:'DTMF separator',groupCall:'DTMF group-call code',onlineCode:'Transmit-start DTMF code',offlineCode:'Transmit-end DTMF code'};
 const tips={sql:'Keeps the speaker quiet until a signal is strong enough to open it.',dualStandby:'Checks both selected channels for activity. This is not two independent receivers.',voxSw:'Lets your voice start a transmission without holding PTT.',vox:'Sets how easily your voice starts a VOX transmission.',tot:'Limits how long one continuous transmission may last.',rxFreq:'Frequency this channel listens to, in MHz.',txFreq:'Frequency this channel transmits on, in MHz. Preserve a blank value if transmit is disabled.',strRxCtsDcs:'Only opens the speaker for signals with this tone. OFF means no tone filtering.',strTxCtsDcs:'Tone sent with your transmission, often needed to access a repeater.',scanAdd:'Controls whether scanning includes this channel.',busyLock:'Can prevent transmitting while the channel is already busy.',name:'Label shown for this channel when the radio is in name display mode.',beep:'Sound made when you press a key.',roger:'Short sound sent at the end of a transmission.',localID:'DTMF digits used to identify your radio.'};
 function title(k){return labels[k]||k.replace(/^vfo([AB])/,'VFO $1 ').replace(/([a-z])([A-Z])/g,'$1 $2');}
@@ -54,6 +61,7 @@ function field(o,k){
  const original=o[k],choices=o.$type==='KDH.Function'?functionOptions[k]:editorOptions[o.$type]?.[k],input=document.createElement(choices?'select':'input');
  if(choices){const list=choices.some(([v])=>v===original)?choices:[[original,`Unrecognized saved value (${original}) — preserved`],...choices];for(const [value,label] of list){const option=document.createElement('option');option.value=String(value);option.textContent=label;input.append(option);}}
  input.value=k==='name'?visibleName(original):String(original);
+ input.dataset.originalValue=String(original);
  input.dataset.key=k;if(!choices)input.type=typeof original==='number'?'number':'text';
  if(['vfoABusylock','vfoBBusyLock'].includes(k))input.readOnly=true;
  if(k==='name')input.placeholder='Unnamed';
@@ -61,6 +69,11 @@ function field(o,k){
  const help=(tips[k]||'')+(!choices&&typeof original==='number'?' Stored CPS option code; friendly option labels are not verified yet.':'');input.title=help;label.title=help;input.setAttribute('aria-description',help);
  const update=()=>{if(!input.checkValidity())return;const v=k==='name'?editedName(original,input.value):typeof original==='number'?Number(input.value):input.value;if(choices&&v!==original&&!choices.some(([n])=>n===v)){input.value=String(o[k]);return;}if(o[k]!==v){o[k]=v;onChange();}};
  input.addEventListener('input',update);input.addEventListener('change',update);
+ if(isFrequencyField(k)){
+  input.inputMode='decimal';
+  const finish=()=>{if(input.value!==String(original)){input.value=padFrequency(input.value);update();}};
+  input.addEventListener('blur',finish);input.addEventListener('change',finish);
+ }
  label.append(input);return label;
 }
 function form(o,target){for(const k of Object.keys(o))if(k!=='$type'&&k!=='id'&&!Array.isArray(o[k]))target.append(field(o,k));}

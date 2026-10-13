@@ -3,7 +3,7 @@ import {validateEdits} from './validation.mjs';
 import {Writer,makePlan,verificationMessage} from './writer.mjs';
 import {decodeRadio,radioDat} from './radio-decoder.mjs';
 import {blankData,emptyChannel,removeChannels,insertChannel,moveChannel} from './channels.mjs';
-import {configureFields,form,optionalForm,vfoForm,visibleName,visibleTone,editedName} from './fields.mjs';
+import {configureFields,form,optionalForm,vfoForm,visibleName,visibleTone,editedName,isFrequencyField,padFrequency} from './fields.mjs?v=19.1';
 const $=id=>document.getElementById(id),radio=new Writer();
 let schemas,options,charset,defaults,data,baseline,filename='mini5',tab='Channels',dirty=false,busy=false,trustedBase=false,backup=null,writePlan=null,attempted=false,resetRequired=false,log=[],history=[],selected=new Set(),search='',showEmpty=false,page=0,dragIndex=null,activity=Date.now(),idleDeadline=null;
 const pageSize=50,tabs=['Channels','Repeater import','Optional settings','VFO A / B','DTMF','Radio & help'];
@@ -13,7 +13,7 @@ function remember(){history.push(structuredClone(data));if(history.length>20)his
 function changed(){dirty=true;activity=Date.now();sync();}
 function errors(candidate){return validateEdits(candidate,baseline,options,charset);}
 function commit(candidate){const problems=errors(candidate);if(problems.length)throw Error(problems.join('\n'));remember();data=candidate;selected.clear();changed();render();}
-function checked(){if([...$('content').querySelectorAll('input')].some(input=>!input.reportValidity()))throw Error('Please fix the highlighted field before continuing.');const problems=errors(data);if(problems.length)throw Error('Please fix these edits:\n'+problems.join('\n'));return data;}
+function checked(){if([...$('content').querySelectorAll('input')].some(input=>!input.reportValidity()))throw Error('Please fix the highlighted field before continuing.');for(const input of $('content').querySelectorAll('[data-key]')){const k=input.dataset.key;if(['vfoAFreq','vfoBFreq'].includes(k)&&input.value!==input.dataset.originalValue){input.value=padFrequency(input.value);if(data.vfos[k]!==input.value){data.vfos[k]=input.value;changed();}}}const problems=errors(data);if(problems.length)throw Error('Please fix these edits:\n'+problems.join('\n'));return data;}
 function sync(){
  const bluetooth=!!navigator.bluetooth&&window.isSecureContext;
  for(const id of ['open','file','save'])$(id).disabled=busy||!data;
@@ -59,9 +59,9 @@ function renderChannels(c){
  $('selectPage').checked=showing.length>0&&showing.every(({i})=>selected.has(i));$('selectPage').onchange=e=>{showing.forEach(({i})=>e.target.checked?selected.add(i):selected.delete(i));render();};
 }
 function edit(i,insert=false){
- const copy=insert?emptyChannel():structuredClone(data.channelList[0][i]),originalName=copy.name;$('fields').replaceChildren();form(copy,$('fields'));$('editErrors').textContent='';$('editorTitle').textContent=`${insert?'Add above channel':copy.rxFreq?'Edit channel':'Add channel'} ${i+1}`;
+ const copy=insert?emptyChannel():structuredClone(data.channelList[0][i]),original=structuredClone(copy),originalName=copy.name;$('fields').replaceChildren();form(copy,$('fields'));$('editErrors').textContent='';$('editorTitle').textContent=`${insert?'Add above channel':copy.rxFreq?'Edit channel':'Add channel'} ${i+1}`;
  // Edits in the dialog are staged; Cancel discards them without changing the workspace.
- $('apply').onclick=()=>{try{if([...$('fields').querySelectorAll('input')].some(el=>!el.reportValidity()))return;for(const input of $('fields').querySelectorAll('[data-key]')){const k=input.dataset.key;copy[k]=k==='name'?editedName(originalName,input.value):typeof copy[k]==='number'?Number(input.value):input.value;}if(!copy.rxFreq)throw Error('Enter a receive frequency, or use Delete to clear this slot.');const candidate=insert?insertChannel(data,i,copy):structuredClone(data);if(!insert)candidate.channelList[0][i]=copy;commit(candidate);$('editor').close();workspaceStatus();}catch(e){$('editErrors').textContent=e.message;}};$('editor').showModal();
+ $('apply').onclick=()=>{try{if([...$('fields').querySelectorAll('input')].some(el=>!el.reportValidity()))return;for(const input of $('fields').querySelectorAll('[data-key]')){const k=input.dataset.key;if(isFrequencyField(k)&&input.value!==original[k])input.value=padFrequency(input.value);copy[k]=k==='name'?editedName(originalName,input.value):typeof copy[k]==='number'?Number(input.value):input.value;}if(!copy.rxFreq)throw Error('Enter a receive frequency, or use Delete to clear this slot.');const candidate=insert?insertChannel(data,i,copy):structuredClone(data);if(!insert)candidate.channelList[0][i]=copy;commit(candidate);$('editor').close();workspaceStatus();}catch(e){$('editErrors').textContent=e.message;}};$('editor').showModal();
 }
 function deleteSelected(indices=[...selected]){if(!indices.length)return;$('deleteTitle').textContent=`Delete ${indices.length} channel${indices.length===1?'':'s'}?`;const apply=compact=>{try{commit(removeChannels(data,indices,compact));$('deleteDialog').close();workspaceStatus();}catch(e){message(e.message);}};$('deleteLeave').onclick=()=>apply(false);$('deleteRenumber').onclick=()=>apply(true);$('deleteDialog').showModal();}
 function openMove(i){$('moveTo').value=i+1;$('moveApply').onclick=()=>{try{if(!$('moveTo').reportValidity())return;commit(moveChannel(data,i,Number($('moveTo').value)-1));$('moveDialog').close();workspaceStatus();}catch(e){message(e.message);}};$('moveDialog').showModal();}
