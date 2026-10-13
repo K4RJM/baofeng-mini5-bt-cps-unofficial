@@ -30,3 +30,9 @@ No browser Connect/Read/Write was performed against a physical radio. Drag reord
 Local HTTP readiness returned 200. All packaged assets use repository-relative URLs. A GitHub Actions Pages workflow and public-file allowlist are included, following [GitHub's workflow documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). GitHub Actions execution, remote publication and actual hosted Bluetooth permissions are not verified because this build has not been pushed or deployed.
 
 The prior user reported successful build 18 operation on Radio 100 / V0.05 / V1.7, with a manual Wireless CPS toggle required before rereading. That core remains unchanged. Physical validation of build 19 and approval of any future protocol or blank-template writing change remain pending. RepeaterBook API approval and browser-compatible access/export terms remain pending. No RepeaterBook API request or token use occurred.
+
+## v20.9 post-write connection cleanup
+
+The v20.0–v20.8 app programming handlers and retained radio core were compared before this change; no direct programming-code regression was found. CHIRP documents radio restart and BLE connection loss after upload. The new cleanup waits for the existing final acknowledgement, then only calls the existing browser disconnect method. Added simulations check no extra bytes, exact 262 original frames, refusal during active/uncertain writes, already disconnected devices, cleanup failures and subsequent read-back. Reconnection is operator-confirmed and has no fixed reboot deadline. Physical confirmation that this avoids resetting the PC Bluetooth adapter is pending.
+
+All 41 automated tests pass for v20.9. Eleven protected core files remain identical to retained build 18. No physical radio or PC Bluetooth reset was tested by the agent.

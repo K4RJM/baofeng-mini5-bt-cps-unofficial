@@ -18,7 +18,7 @@ The preserved writer sends 262 sequential blocks with 128-byte payloads. The use
 2. Connect and Read radio, or open a native CPS DAT. Reading loads the same workspace and retains the connection. Connect does not send programming commands.
 3. Save a CPS DAT backup, keep original files and the cable available, and review edits. No forced backup download or preparatory full read is imposed.
 4. Every explicit write requires the damage warning and existing-backup confirmation. The preserved checks run before write blocks. Edits freeze during radio operations. A source locks after one attempt; timeout/bad ACK disconnect with no automatic retry.
-5. After a write attempt, toggle Wireless CPS OFF, then ON before reading or verifying. The prompt requires the operator to confirm, disconnects locally, and reconnects normally. It sends no reset command. Read-back checks bytes, not all operating functions.
+5. After all 262 acknowledgements, the app requests a browser GATT disconnect before the expected firmware reboot. This does not prove internal commit completion and has not been physically verified. Before another read, a prompt clears the old browser link and waits for explicit restart confirmation, with no fixed timer. Wireless CPS OFF/ON is available as a fallback; an uncertain write requires this fallback. No new radio reset command or automatic write retry is sent. Read-back checks bytes, not all operating functions.
 6. Save the diagnostic report on failure. Do not infer success from a timeout, ACK count alone or reboot. Consider official CPS/cable recovery instead of repeated writes.
 
 ## Blank workspaces and files
