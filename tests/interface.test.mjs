@@ -25,8 +25,9 @@ test('single-screen safety controls, read/write locks, reset prompt, idle timeou
   const tutorialPanel=get('content').querySelectorAll('section').find(s=>s.id==='radioTutorialPanel');
   const tutorialText=()=>tutorialPanel.querySelectorAll('h3').map(e=>e.textContent).join(' ');
   assert.equal(diagramButtons.length,23);
-  diagramButtons.find(b=>b.dataset.radioKey==='0').onmouseenter();assert.match(tutorialText(),/weather shortcut/);
-  diagramButtons.find(b=>b.dataset.radioKey==='star').onfocus();assert.match(tutorialText(),/keypad lock/);
+  diagramButtons.find(b=>b.dataset.radioKey==='0').onmouseenter();assert.match(tutorialText(),/Number keys — frequency and channel entry/);assert.match(tutorialText(),/Longpress/);assert.ok(tutorialPanel.querySelectorAll('li').some(e=>e.textContent.includes('enter weather mode')));
+  diagramButtons.find(b=>b.dataset.radioKey==='8').click();assert.match(tutorialText(),/Number keys — frequency and channel entry/);assert.match(tutorialText(),/Longpress/);assert.ok(tutorialPanel.querySelectorAll('li').some(e=>e.textContent.includes('change transmit power')));
+  diagramButtons.find(b=>b.dataset.radioKey==='star').onfocus();assert.match(tutorialText(),/repeater functions/);assert.match(tutorialText(),/Longpress/);
   diagramButtons.find(b=>b.dataset.radioKey==='sk1').click();assert.match(tutorialText(),/configurable side key/);assert.ok(tutorialPanel.querySelectorAll('p').some(p=>p.textContent==='Current workspace assignment: Channel scan'));
   assert.equal(connections.length,0);assert.equal(get('writeRadio').disabled,true);
   get('tabs').querySelectorAll('button').find(b=>b.textContent.includes('Channels')).click();

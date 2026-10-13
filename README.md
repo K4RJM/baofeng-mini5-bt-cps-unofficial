@@ -16,6 +16,8 @@ Build 19.6 adds a simplified interactive Mini 5 button diagram in Radio & help. 
 
 Build 19.7 expands the SK1 tutorial with all six supported programmable short-press assignments and their functions. The list uses the existing CPS option table; no assignments or radio behavior were added.
 
+Build 19.8 retains normal number-key entry instructions for 0 and 8 and puts their hold functions under a larger Longpress heading. MENU, * and # also separate short-press instructions from documented hold functions. Radio behavior is unchanged.
+
 ⚠ **Experimental Software — Radio Damage Risk**
 
 Programming errors, software defects, or interrupted communication may render your radio inoperable. Always maintain a backup dat for use with official CPS and programming cable.

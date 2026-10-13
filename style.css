@@ -35,6 +35,8 @@ main{padding-top:12px}
 .radio-tutorial-panel h4{margin:16px 0 8px;font-size:13px}
 .sk1-functions{padding-left:18px;margin:8px 0 16px;color:var(--muted);font-size:12px}
 .sk1-functions strong{color:var(--text)}
+.radio-tutorial-panel h3.longpress-title{font-size:22px;margin:20px 0 10px}
+.radio-tutorial-panel .longpress-steps{font-size:13px}
 @media(max-width:1000px){.radio-tutorial-layout{grid-template-columns:250px minmax(0,1fr);gap:14px}.radio-drawing{width:250px}.radio-tutorial-panel{padding:14px}}
 @media(max-width:750px){.radio-tutorial-layout{grid-template-columns:minmax(0,1fr)}.radio-drawing{width:300px}.radio-tutorial-panel{min-height:0}.radio-key{font-size:10px}}
 @media(max-width:750px){.workspace-head{gap:8px}.workspace-head h2{font-size:19px}.workspace-head p{font-size:11px}.workspace-head .tag{font-size:10px;padding:4px 6px}}
