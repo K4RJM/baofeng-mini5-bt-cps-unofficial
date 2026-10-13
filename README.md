@@ -20,11 +20,13 @@ Build 19.8 retains normal number-key entry instructions for 0 and 8 and puts the
 
 Build 20.1 builds on the maintainer’s v20.0 help revisions. It standardizes Key / Short Press / Long Press typography; explains all six hold shortcuts; corrects # to the user-reported DTMF dialing behavior with its transmission warning; expands reverse/talkaround, frequency search and SK1 activation-tone guidance. The guide is display-only. Radio programming behavior and all safety restrictions remain unchanged.
 
+Build 20.2 shortens SK1 instructions and keeps the tutorial panel at a steady height, with internal scrolling for longer guides. Hovering between keys no longer changes the page height. Radio programming behavior is unchanged.
+
+Build 20.3 removes the redundant SK1 assignment-list heading. The six descriptions, current assignment, transmission warnings and steady tutorial height are retained.
+
 ⚠ **Experimental Software — Radio Damage Risk**
 
 Programming errors, software defects, or interrupted communication may render your radio inoperable. Always maintain a backup dat for use with official CPS and programming cable.
-
-Build 20.2 shortens SK1 instructions and keeps the tutorial panel at a steady height, with internal scrolling for longer guides. Hovering between keys no longer changes the page height. Radio programming behavior is unchanged.
 
 ## Implemented
 

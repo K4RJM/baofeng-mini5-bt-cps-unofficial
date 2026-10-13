@@ -52,7 +52,6 @@ export function renderRadioTutorial(target,settings={},options=[]){
   addInstructions(t.shortpressTitle,t.steps);
   if(t.warning){const warning=element('p',t.warning,'tutorial-warning');warning.setAttribute('role','note');panel.append(warning);}
   if(key==='sk1'){
-   panel.append(element('h5',`All ${options.length} supported assignments`));
    const functions=element('ul',null,'sk1-functions');for(const [value,label]of options){const item=element('li');item.append(element('strong',label+' — '),sk1Descriptions[value]||'Saved CPS assignment; detailed behavior is not verified.');functions.append(item);}panel.append(functions);
    const assignment=options.find(([value])=>value===settings.key2Short)?.[1]||'Unrecognized saved assignment';panel.append(element('p','Current workspace assignment: '+assignment,'radio-assignment'));
   }
