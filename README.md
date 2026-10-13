@@ -24,6 +24,8 @@ Build 20.1 builds on the maintainer’s v20.0 help revisions. It standardizes Ke
 
 Programming errors, software defects, or interrupted communication may render your radio inoperable. Always maintain a backup dat for use with official CPS and programming cable.
 
+Build 20.2 shortens SK1 instructions and keeps the tutorial panel at a steady height, with internal scrolling for longer guides. Hovering between keys no longer changes the page height. Radio programming behavior is unchanged.
+
 ## Implemented
 
 - System-aware dark/light appearance and manual override, responsive left navigation, fixed warning/progress and connection status.
