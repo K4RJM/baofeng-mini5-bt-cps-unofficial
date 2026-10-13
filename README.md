@@ -51,6 +51,8 @@ RepeaterBook approval, CORS/identification, individual app-bound tokens, export/
 
 Read [SAFETY.md](docs/SAFETY.md) before programming. Blank workspaces support editing/export; Bluetooth writing requires loaded CPS or radio settings. Every write programs the complete CPS configuration.
 
+Build 20.8 adds Previous / Next to the channel editor. Moving applies valid workspace edits, skips empty slots unless Show empty slots is on, crosses table pages and ignores the table search filter. Invalid edits block navigation; closing discards only the current staged edits. Unchanged navigation creates no Undo entry. Insert-above editing keeps its existing single-insertion behavior. Radio programming is unchanged.
+
 ## Run locally
 
 No packages need installation. With Node.js 20 or newer:

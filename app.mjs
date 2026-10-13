@@ -2,8 +2,8 @@ import {readDat,writeDat} from './dat.mjs';
 import {validateEdits} from './validation.mjs';
 import {Writer,makePlan,verificationMessage} from './writer.mjs';
 import {decodeRadio,radioDat} from './radio-decoder.mjs';
-import {openChannelAppend} from './channel-import-ui.mjs?v=20.7';
-import {renderRadioTutorial} from './radio-help.mjs?v=20.7';
+import {openChannelAppend} from './channel-import-ui.mjs?v=20.8';
+import {renderRadioTutorial} from './radio-help.mjs?v=20.8';
 import {blankData,emptyChannel,removeChannels,insertChannel,moveChannel} from './channels.mjs';
 import {configureFields,form,optionalForm,vfoForm,visibleName,visibleTone,editedName,isFrequencyField,padFrequency} from './fields.mjs?v=19.1';
 const $=id=>document.getElementById(id),radio=new Writer();
@@ -14,7 +14,7 @@ const pageSize=50,tabs=['Channels','Repeater import','Optional settings','VFO A 
 const featureGuides={
  'Channels':{title:'How to edit and arrange channels',body:`<p><strong>Channels are saved radio memories.</strong> Start by opening a native CPS .dat or reading your radio. Changes here affect the workspace; they reach the radio only after an explicit Write radio action.</p>
 <ul><li><strong>Click a channel row</strong> to edit it, or focus the row and press Enter. Checkboxes and action buttons keep their own functions. Editing and deletion preserve your position in the list.</li>
-<li><strong>+ Add channel</strong> opens the first empty slot. Enter receive/transmit frequencies, tones and a name, then choose <strong>Apply channel edits</strong>. Closing the dialog discards its staged edits.</li>
+<li><strong>+ Add channel</strong> opens the first empty slot. Enter receive/transmit frequencies, tones and a name, then choose <strong>Apply channel edits</strong>. <strong>Previous / Next</strong> applies valid edits before moving through channel numbers, skipping empty slots unless Show empty slots is on. Navigation crosses table pages and ignores the search filter. Closing discards only the current staged edits; changes already applied remain in the workspace.</li>
 <li><strong>Add preset / Append .dat:</strong> load a radio read or native DAT first. Choose next available consecutive slots or an entirely empty numbered block. Preview placement; matching channels are skipped by default. Additions preserve current radio settings and support Undo. Programming still uses the separate full Write radio action.</li>
 <li><strong>Frequency entry:</strong> 146.52 becomes 146.52000 when you leave the field or apply. Extra decimal places are rejected rather than rounded. Preserve a blank transmit frequency when it is already disabled in your configuration.</li>
 <li><strong>RX tone</strong> controls tone filtering on reception; Off means no tone filter. <strong>TX tone</strong> is the tone sent with a transmission, such as the access tone supplied by a repeater operator. <strong>Include in scan</strong> includes or skips a memory; it does not start scanning.</li>
@@ -122,9 +122,41 @@ function openAppend(mode){
  }});
 }
 function edit(i,insert=false){
- const copy=insert?emptyChannel():structuredClone(data.channelList[0][i]),original=structuredClone(copy),originalName=copy.name;$('fields').replaceChildren();form(copy,$('fields'));$('editErrors').textContent='';$('editorTitle').textContent=`${insert?'Add above channel':copy.rxFreq?'Edit channel':'Add channel'} ${i+1}`;
- // Edits in the dialog are staged; Cancel discards them without changing the workspace.
- $('apply').onclick=()=>{try{if([...$('fields').querySelectorAll('input')].some(el=>!el.reportValidity()))return;for(const input of $('fields').querySelectorAll('[data-key]')){const k=input.dataset.key;if(isFrequencyField(k)&&input.value!==original[k])input.value=padFrequency(input.value);copy[k]=k==='name'?editedName(originalName,input.value):typeof copy[k]==='number'?Number(input.value):input.value;}if(!copy.rxFreq)throw Error('Enter a receive frequency, or use Delete to clear this slot.');const candidate=insert?insertChannel(data,i,copy):structuredClone(data);if(!insert)candidate.channelList[0][i]=copy;const view=captureChannelView();commit(candidate);$('editor').close();restoreChannelView(view,i);workspaceStatus();}catch(e){$('editErrors').textContent=e.message;}};$('editor').showModal();
+ const view=captureChannelView();let copy,original,originalName;
+ const adjacent=step=>{for(let n=i+step;n>=0&&n<999;n+=step)if(showEmpty||data.channelList[0][n].rxFreq)return n;return null;};
+ function populate(){
+  copy=insert?emptyChannel():structuredClone(data.channelList[0][i]);original=structuredClone(copy);originalName=copy.name;
+  $('fields').replaceChildren();form(copy,$('fields'));$('editErrors').textContent='';
+  $('editorTitle').textContent=`${insert?'Add above channel':copy.rxFreq?'Edit channel':'Add channel'} ${i+1}`;
+  $('editorNavigation').hidden=insert;
+  for(const [id,step]of [['editPrevious',-1],['editNext',1]]){
+   const next=adjacent(step);$(id).disabled=insert||next===null;
+   $(id).title=next===null?'No '+(step<0?'previous':'next')+' channel':'Apply edits and open channel '+(next+1);
+  }
+ }
+ function apply(navigating=false){
+  try{
+   if([...$('fields').querySelectorAll('input')].some(el=>!el.reportValidity()))return false;
+   for(const input of $('fields').querySelectorAll('[data-key]')){
+    const k=input.dataset.key;if(isFrequencyField(k)&&input.value!==original[k])input.value=padFrequency(input.value);
+    copy[k]=k==='name'?editedName(originalName,input.value):typeof copy[k]==='number'?Number(input.value):input.value;
+   }
+   const modified=JSON.stringify(copy)!==JSON.stringify(original);
+   if(!copy.rxFreq&&(!navigating||modified))throw Error('Enter a receive frequency, or use Delete to clear this slot.');
+   if(modified||insert){
+    const candidate=insert?insertChannel(data,i,copy):structuredClone(data);if(!insert)candidate.channelList[0][i]=copy;
+    commit(candidate);workspaceStatus();
+   }
+   return true;
+  }catch(e){$('editErrors').textContent=e.message;return false;}
+ }
+ // Navigation applies the current edits; closing discards only the current staged edits.
+ for(const [id,step]of [['editPrevious',-1],['editNext',1]])$(id).onclick=()=>{
+  if(insert)return;const next=adjacent(step);if(next===null||!apply(true))return;
+  i=next;populate();$(id).focus({preventScroll:true});
+ };
+ $('apply').onclick=()=>{if(apply()){$('editor').close();restoreChannelView(view,i);}};
+ populate();$('editor').showModal();
 }
 function deleteSelected(indices=[...selected]){if(!indices.length)return;$('deleteTitle').textContent=`Delete ${indices.length} channel${indices.length===1?'':'s'}?`;const apply=compact=>{try{const view=captureChannelView();commit(removeChannels(data,indices,compact));$('deleteDialog').close();restoreChannelView(view,Math.min(...indices));workspaceStatus();}catch(e){message(e.message);}};$('deleteLeave').onclick=()=>apply(false);$('deleteRenumber').onclick=()=>apply(true);$('deleteDialog').showModal();}
 function openMove(i){$('moveTo').value=i+1;$('moveApply').onclick=()=>{try{if(!$('moveTo').reportValidity())return;commit(moveChannel(data,i,Number($('moveTo').value)-1));$('moveDialog').close();workspaceStatus();}catch(e){message(e.message);}};$('moveDialog').showModal();}
