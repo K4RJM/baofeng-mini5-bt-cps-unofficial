@@ -4,6 +4,8 @@ Free, noncommercial browser software by K4RJM, prepared for GitHub Pages. Build 
 
 Build 19.1 adds trailing-zero completion for edited channel/VFO frequencies: `146.52` becomes `146.52000` on leaving the field or applying/saving. Blank transmit fields remain blank, excess precision is rejected rather than rounded, and untouched imported values remain unchanged. All 28 tests pass; protected radio/codec/validation files remain unchanged.
 
+Build 19.2 places the workspace title, description and source badge on one compact line, removes the redundant workspace label, and reduces spacing around the status bar. Long descriptions truncate visually on narrow screens while their full text remains available to assistive technology. Radio behavior is unchanged.
+
 ⚠ **Experimental Software — Radio Damage Risk**
 
 Programming errors, software defects, or interrupted communication may render your radio inoperable. Always maintain a backup dat for use with official CPS and programming cable.

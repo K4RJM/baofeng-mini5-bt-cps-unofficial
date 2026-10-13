@@ -5,3 +5,11 @@
 aside,nav,.side-section,.card,label{min-width:0}label input,label select{min-width:0}
 @media(min-width:1100px){aside{position:sticky;top:40px;max-height:calc(100vh - 40px)}}@media(max-width:1100px){h1{font-size:18px}.connection{display:none}.risk-banner{display:block}.risk-banner strong{display:block}.session-bar{top:69px}.vfo-fields{grid-template-columns:1fr}.repeater-form{grid-template-columns:1fr 1fr}}@media(max-width:750px){.topbar{padding:14px;flex-wrap:wrap}.top-actions{width:100%;justify-content:space-between}.topbar h1{font-size:16px}.app-layout{grid-template-columns:minmax(0,1fr)}aside{padding:10px;gap:12px;border-right:0;border-bottom:1px solid var(--border)}nav{display:flex;overflow:auto}nav button{white-space:nowrap;padding:9px}.side-section{display:flex;overflow:auto;border:0;padding:0}.side-section .eyebrow,.side-bottom{display:none}main{padding:20px 14px}.risk-banner{padding:8px 14px;font-size:11px}.session-bar{top:90px}.workspace-head{align-items:flex-start}.workspace-head h2{font-size:23px}.workspace-head .tag{display:none}.optional-columns,.vfo-columns,.workflow,.repeater-form{grid-template-columns:minmax(0,1fr)}.table-wrap{max-height:55vh}.toolbar input[type=search]{min-width:0;width:100%}.toolbar-controls{width:100%}.card{padding:16px}.card h3 .tag{display:block;width:fit-content;margin-top:8px}.dialog-actions{justify-content:flex-start}footer{flex-direction:column;gap:6px}}
 .session-bar{top:calc(var(--warning-height,80px) + 8px)}@media(min-width:1100px){aside{top:var(--warning-height,80px);max-height:calc(100vh - var(--warning-height,80px))}}
+/* Compact workspace heading: title, description and source on one line. */
+main{padding-top:12px}
+.workspace-head{display:grid;grid-template-columns:max-content minmax(0,1fr) max-content;align-items:center;gap:16px;min-height:30px}
+.workspace-head h2{font-size:22px;margin:0;white-space:nowrap}
+.workspace-head p{margin:0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.workspace-head .tag{display:inline-block}
+.session-bar{margin:8px 0 12px;padding:8px 12px}
+@media(max-width:750px){.workspace-head{gap:8px}.workspace-head h2{font-size:19px}.workspace-head p{font-size:11px}.workspace-head .tag{font-size:10px;padding:4px 6px}}
