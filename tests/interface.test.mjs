@@ -1,6 +1,7 @@
 // Executes the real UI handlers against a minimal DOM and simulated transport.
 // It does not replace browser visual or physical-radio checks.
 import {test} from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
+import {renderRadioTutorial} from '../radio-help.mjs';
 import {readDat,writeDat} from '../dat.mjs';import {validateEdits} from '../validation.mjs';import {Writer,makePlan,verificationMessage} from '../writer.mjs';import {decodeRadio,radioDat} from '../radio-decoder.mjs';import {blankData,emptyChannel,removeChannels,insertChannel,moveChannel} from '../channels.mjs';import {configureFields,form,optionalForm,vfoForm,visibleName,visibleTone,editedName,isFrequencyField,padFrequency} from '../fields.mjs';import {simulatedRadio} from './simulate.mjs';import {schemas,fixture} from './fixtures.mjs';
 test('single-screen safety controls, read/write locks, reset prompt, idle timeout and native backups',async()=>{
  const nodes=new Map();class Element{
@@ -15,10 +16,21 @@ test('single-screen safety controls, read/write locks, reset prompt, idle timeou
  const get=id=>{if(!nodes.has(id))nodes.set(id,new Element(id));return nodes.get(id);};const doc={getElementById:get,createElement:tag=>new Element(tag),documentElement:new Element('html'),addEventListener(){}};
  globalThis.document=doc;const win={isSecureContext:true,addEventListener(){}};let now=1000000,interval,download;
  const originalConnect=Writer.prototype.connect,connections=[];Writer.prototype.connect=async function(){const sim=simulatedRadio(this);connections.push(sim);};
- const ctx=vm.createContext({document:doc,window:win,navigator:{bluetooth:{}},localStorage:{getItem(){},setItem(){}},structuredClone,Blob,Uint8Array,console,Date:{now:()=>now},URL:{createObjectURL(b){download=b;return 'mock';},revokeObjectURL(){}},setTimeout(){},setInterval(f){interval=f;},confirm:()=>true,fetch:async p=>({json:async()=>JSON.parse(fs.readFileSync(new URL('../'+p,import.meta.url)))}),readDat,writeDat,validateEdits,Writer,makePlan,verificationMessage,decodeRadio,radioDat,blankData,emptyChannel,removeChannels,insertChannel,moveChannel,configureFields,form,optionalForm,vfoForm,visibleName,visibleTone,editedName,isFrequencyField,padFrequency});
+ const ctx=vm.createContext({document:doc,window:win,navigator:{bluetooth:{}},localStorage:{getItem(){},setItem(){}},structuredClone,Blob,Uint8Array,console,Date:{now:()=>now},URL:{createObjectURL(b){download=b;return 'mock';},revokeObjectURL(){}},setTimeout(){},setInterval(f){interval=f;},confirm:()=>true,fetch:async p=>({json:async()=>JSON.parse(fs.readFileSync(new URL('../'+p,import.meta.url)))}),readDat,writeDat,validateEdits,Writer,makePlan,verificationMessage,decodeRadio,radioDat,blankData,emptyChannel,removeChannels,insertChannel,moveChannel,configureFields,form,optionalForm,vfoForm,visibleName,visibleTone,editedName,isFrequencyField,padFrequency,renderRadioTutorial});
  try{
   const source=fs.readFileSync(new URL('../app.mjs',import.meta.url),'utf8').replace(/^import .*$/gm,'');await vm.runInContext('(async()=>{'+source+'})()',ctx);
   assert.equal(get('writeRadio').disabled,true);assert.equal(connections.length,0);
+  get('help').click();
+  const diagramButtons=get('content').querySelectorAll('button').filter(b=>b.dataset.radioKey);
+  const tutorialPanel=get('content').querySelectorAll('section').find(s=>s.id==='radioTutorialPanel');
+  const tutorialText=()=>tutorialPanel.querySelectorAll('h3').map(e=>e.textContent).join(' ');
+  assert.equal(diagramButtons.length,23);
+  diagramButtons.find(b=>b.dataset.radioKey==='0').onmouseenter();assert.match(tutorialText(),/weather shortcut/);
+  diagramButtons.find(b=>b.dataset.radioKey==='star').onfocus();assert.match(tutorialText(),/keypad lock/);
+  diagramButtons.find(b=>b.dataset.radioKey==='sk1').click();assert.match(tutorialText(),/configurable side key/);assert.ok(tutorialPanel.querySelectorAll('p').some(p=>p.textContent==='Current workspace assignment: Channel scan'));
+  assert.equal(connections.length,0);assert.equal(get('writeRadio').disabled,true);
+  get('tabs').querySelectorAll('button').find(b=>b.textContent.includes('Channels')).click();
+
   const bytes=writeDat(fixture(),schemas);get('file').files=[{name:'synthetic.dat',arrayBuffer:async()=>bytes}];await get('file').onchange();assert.equal(get('writeRadio').disabled,false);
   get('writeRadio').click();assert.equal(get('warning').open,true);assert.equal(get('confirmWrite').disabled,true);await get('confirmWrite').click();assert.equal(connections.length,0);get('cancelWrite').click();assert.equal(connections.length,0);
   get('writeRadio').click();get('hasBackup').checked=true;get('hasBackup').onchange();await get('confirmWrite').click();assert.equal(connections.length,1);assert.equal(connections[0].writes().length,262);assert.equal(get('writeRadio').disabled,true);assert.equal(get('verify').disabled,false);assert.match(get('status').textContent,/not verified/);

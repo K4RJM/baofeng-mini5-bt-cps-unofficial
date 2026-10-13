@@ -1,5 +1,5 @@
 import {mkdir,copyFile,writeFile} from 'node:fs/promises';
-const files=['index.html','style.css','radio.svg','app.mjs','fields.mjs','channels.mjs','dat.mjs','validation.mjs','writer.mjs','radio-encoder.mjs','radio-decoder.mjs','schemas.json','function-options.json','editor-options.json','name-charset.json','defaults.json','read-test/reader.mjs','read-test/memory.mjs','LICENSE','README.md','docs/SAFETY.md','docs/REPEATERBOOK.md','docs/VERIFICATION.md','docs/protected-core.json'];
+const files=['index.html','style.css','radio.svg','app.mjs','radio-help.mjs','fields.mjs','channels.mjs','dat.mjs','validation.mjs','writer.mjs','radio-encoder.mjs','radio-decoder.mjs','schemas.json','function-options.json','editor-options.json','name-charset.json','defaults.json','read-test/reader.mjs','read-test/memory.mjs','LICENSE','README.md','docs/SAFETY.md','docs/REPEATERBOOK.md','docs/VERIFICATION.md','docs/protected-core.json'];
 await mkdir('dist/read-test',{recursive:true});await mkdir('dist/docs',{recursive:true});
 for(const file of files)await copyFile(file,'dist/'+file);
 await writeFile('dist/.nojekyll','');console.log('GitHub Pages artifact prepared: dist/ ('+files.length+' files)');

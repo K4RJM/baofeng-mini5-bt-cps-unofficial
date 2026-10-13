@@ -20,4 +20,18 @@ main{padding-top:12px}
 .guide-body ul{margin:8px 0 14px;padding-left:20px}
 .guide-body li{margin:8px 0}
 .guide-body p{margin:8px 0 14px}
+.radio-tutorial-layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:24px;align-items:start}
+.radio-drawing{position:relative;width:300px;max-width:100%;aspect-ratio:300/460;margin:auto}
+.radio-outline,.radio-outline svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.radio-key{position:absolute;padding:0;border-radius:5px;background:#233348;border-color:#52687d;color:#e8edf5;font-size:9px;line-height:1.1;min-width:0;white-space:normal;box-shadow:0 2px 2px #0004}
+.radio-key.radio-side-key{font-size:9px;writing-mode:vertical-rl}
+.radio-key:hover,.radio-key:focus-visible,.radio-key.tutorial-active{background:#195488;border-color:#75b7ff;color:#fff;outline:2px solid #75b7ff;outline-offset:2px}
+.radio-tutorial-panel{min-width:0;min-height:280px;padding:18px;background:var(--raised);border:1px solid var(--border);border-radius:9px}
+.radio-tutorial-panel h3{margin:12px 0;font-size:18px}
+.radio-tutorial-panel ol{margin:12px 0 18px;padding-left:20px;color:var(--muted);font-size:13px}
+.radio-tutorial-panel li{margin:10px 0}
+.radio-assignment{color:var(--text);font-weight:600;font-size:12px}
+.radio-tutorial-source{margin:14px 0 0}
+@media(max-width:1000px){.radio-tutorial-layout{grid-template-columns:250px minmax(0,1fr);gap:14px}.radio-drawing{width:250px}.radio-tutorial-panel{padding:14px}}
+@media(max-width:750px){.radio-tutorial-layout{grid-template-columns:minmax(0,1fr)}.radio-drawing{width:300px}.radio-tutorial-panel{min-height:0}.radio-key{font-size:10px}}
 @media(max-width:750px){.workspace-head{gap:8px}.workspace-head h2{font-size:19px}.workspace-head p{font-size:11px}.workspace-head .tag{font-size:10px;padding:4px 6px}}

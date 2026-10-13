@@ -12,6 +12,8 @@ Build 19.4 adds K4RJM's GitHub profile and QRZ callsign links below the develope
 
 Build 19.5 adds expandable feature guides on the editing screens and a Help walkthrough covering files, channels, optional settings, VFOs and DTMF. It distinguishes signaling-code groups from channel groups, explains the radio’s built-in weather button, and marks unavailable presets and RepeaterBook import. Radio programming behavior is unchanged.
 
+Build 19.6 adds a simplified interactive Mini 5 button diagram in Radio & help. Hover, keyboard focus or tap shows a tutorial, labels fixed versus assignable controls, and explains the workspace side-key assignment. The diagram only displays instructions; it sends no radio commands.
+
 ⚠ **Experimental Software — Radio Damage Risk**
 
 Programming errors, software defects, or interrupted communication may render your radio inoperable. Always maintain a backup dat for use with official CPS and programming cable.
