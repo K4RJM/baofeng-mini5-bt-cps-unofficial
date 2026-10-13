@@ -6,6 +6,8 @@ Build 19.1 adds trailing-zero completion for edited channel/VFO frequencies: `14
 
 Build 19.2 places the workspace title, description and source badge on one compact line, removes the redundant workspace label, and reduces spacing around the status bar. Long descriptions truncate visually on narrow screens while their full text remains available to assistive technology. Radio behavior is unchanged.
 
+Build 19.3 adds Help guidance that only native CPS DAT files are supported and explains using the same file with stock Baofeng CPS/cable or this app/Bluetooth.
+
 ⚠ **Experimental Software — Radio Damage Risk**
 
 Programming errors, software defects, or interrupted communication may render your radio inoperable. Always maintain a backup dat for use with official CPS and programming cable.
