@@ -28,7 +28,7 @@ test('single-screen safety controls, read/write locks, reset prompt, idle timeou
   diagramButtons.find(b=>b.dataset.radioKey==='0').onmouseenter();assert.match(tutorialText(),/Short Press – Numeric Entry/);assert.match(tutorialText(),/Long Press – Weather/);assert.ok(tutorialPanel.querySelectorAll('li').some(e=>e.textContent.includes('enter weather mode')));
   diagramButtons.find(b=>b.dataset.radioKey==='8').click();assert.match(tutorialText(),/Short Press – Numeric Entry/);assert.match(tutorialText(),/Long Press – Transmit Power/);assert.ok(tutorialPanel.querySelectorAll('li').some(e=>e.textContent.includes('switch between Low (L) and High (H)')));
   diagramButtons.find(b=>b.dataset.radioKey==='star').onfocus();assert.match(tutorialText(),/Short Press – Reverse \/ Talkaround/);assert.match(tutorialText(),/Long Press – Keypad Lock/);
-  diagramButtons.find(b=>b.dataset.radioKey==='sk1').click();assert.match(tutorialText(),/Short Press – Programmable Function/);assert.ok(tutorialPanel.querySelectorAll('p').some(p=>p.textContent==='Current workspace assignment: Channel scan'));
+  diagramButtons.find(b=>b.dataset.radioKey==='sk1').click();assert.match(tutorialText(),/Short Press – Programmable Function/);
   assert.equal(connections.length,0);assert.equal(get('writeRadio').disabled,true);
   get('tabs').querySelectorAll('button').find(b=>b.textContent.includes('Channels')).click();
 
@@ -52,7 +52,7 @@ test('single-screen safety controls, read/write locks, reset prompt, idle timeou
  }finally{Writer.prototype.connect=originalConnect;delete globalThis.document;}
 });
 
-test('radio guide separates all six hold actions and preserves the DTMF transmission warning',()=>{
+test('radio guide separates all six hold actions and retains DTMF transmission instructions',()=>{
  class GuideElement{
   constructor(tag){this.tag=tag;this.children=[];this.dataset={};this.style={};this.classList={toggle(){}};}
   append(...items){this.children.push(...items);}replaceChildren(...items){this.children=items;}setAttribute(key,value){this[key]=value;}
@@ -80,10 +80,10 @@ test('radio guide separates all six hold actions and preserves the DTMF transmis
    assert.ok(panel.querySelectorAll('h4').every(h=>h.className==='tutorial-action-title'));
   }
   select('hash');const dtmf=textOf(panel);
-  assert.match(dtmf,/PTT exits the screen even if no digits were entered/);assert.match(dtmf,/EXIT does not cancel the screen/);assert.match(dtmf,/No method of exiting without transmitting has been confirmed/);assert.match(dtmf,/not been independently verified with a receiving radio/);
-  const warning=panel.querySelectorAll('p').find(p=>p.className==='tutorial-warning');assert.equal(warning.role,'note');assert.match(warning.textContent,/PTT initiates transmission/);assert.doesNotMatch(dtmf,/FM.*station search/i);
+  assert.match(dtmf,/PTT exits the screen even if no digits were entered/);assert.match(dtmf,/EXIT does not cancel the screen/);assert.match(dtmf,/No method of exiting without transmitting has been confirmed/);
+  assert.equal(panel.querySelectorAll('p').length,0);assert.doesNotMatch(dtmf,/FM.*station search/i);
   select('lamp');const search=textOf(panel);assert.match(search,/# switches the search band between VHF and UHF/);assert.match(search,/attempts to identify/);assert.match(search,/MENU saves/);assert.match(search,/overwrite procedure has not been confirmed/);
-  select('sk1');assert.deepEqual(headings(),['Short Press – Programmable Function','PTT + SK1 – Repeater Activation Tone']);assert.equal(panel.querySelectorAll('strong').length,6);assert.match(textOf(panel),/Current workspace assignment: FM broadcast radio/);assert.match(textOf(panel),/1000, 1450, 1750 and 2100 Hz/);assert.match(textOf(panel),/not been physically verified/);assert.match(textOf(panel),/may sound locally or transmit/);
+  select('sk1');assert.deepEqual(headings(),['Short Press – Programmable Function','PTT + SK1 – Repeater Activation Tone']);assert.equal(panel.querySelectorAll('strong').length,6);assert.doesNotMatch(textOf(panel),/Current workspace assignment|workspace assignment may differ|No verified SK1 long-press remapping|This combination transmits\. The diagram only shows instructions/);assert.match(textOf(panel),/1000, 1450, 1750 and 2100 Hz/);assert.match(textOf(panel),/not been physically verified/);assert.match(textOf(panel),/may sound locally or transmit/);
   for(const key of ['ptta','pttb','vm','ab','up','down','exit','1','2','3','4','5','6','7','9']){select(key);assert.ok(!headings().some(h=>h.startsWith('Long Press')),'Unexpected hold action: '+key);}
  }finally{if(previousDocument===undefined)delete globalThis.document;else globalThis.document=previousDocument;}
 });

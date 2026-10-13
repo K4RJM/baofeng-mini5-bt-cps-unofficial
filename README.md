@@ -1,6 +1,6 @@
 # Baofeng Mini 5 BT CPS – Unofficial
 
-Free, noncommercial browser software by K4RJM, prepared for GitHub Pages. Build 19 replaces the placeholder with a single-screen editor, preserving the user-tested build 18 radio core unchanged.
+Free, noncommercial browser software by K4RJM, prepared for GitHub Pages. Build 19 replaces the placeholder with a single-screen editor, preserving the hardware-tested build 18 radio core unchanged.
 
 Build 19.1 adds trailing-zero completion for edited channel/VFO frequencies: `146.52` becomes `146.52000` on leaving the field or applying/saving. Blank transmit fields remain blank, excess precision is rejected rather than rounded, and untouched imported values remain unchanged. All 28 tests pass; protected radio/codec/validation files remain unchanged.
 
@@ -18,11 +18,13 @@ Build 19.7 expands the SK1 tutorial with all six supported programmable short-pr
 
 Build 19.8 retains normal number-key entry instructions for 0 and 8 and puts their hold functions under a larger Longpress heading. MENU, * and # also separate short-press instructions from documented hold functions. Radio behavior is unchanged.
 
-Build 20.1 builds on the maintainer’s v20.0 help revisions. It standardizes Key / Short Press / Long Press typography; explains all six hold shortcuts; corrects # to the user-reported DTMF dialing behavior with its transmission warning; expands reverse/talkaround, frequency search and SK1 activation-tone guidance. The guide is display-only. Radio programming behavior and all safety restrictions remain unchanged.
+Build 20.1 builds on the maintainer’s v20.0 help revisions. It standardizes Key / Short Press / Long Press typography; explains all six hold shortcuts; corrects # to the reported DTMF dialing behavior with its transmission warning; expands reverse/talkaround, frequency search and SK1 activation-tone guidance. The guide is display-only. Radio programming behavior and all safety restrictions remain unchanged.
 
 Build 20.2 shortens SK1 instructions and keeps the tutorial panel at a steady height, with internal scrolling for longer guides. Hovering between keys no longer changes the page height. Radio programming behavior is unchanged.
 
 Build 20.3 removes the redundant SK1 assignment-list heading. The six descriptions, current assignment, transmission warnings and steady tutorial height are retained.
+
+Build 20.4 simplifies the button tutorials by removing the SK1 workspace/diagram notes, repetitive DTMF paragraphs, number-key assignment note, power/workspace note and flashlight/search note. Help uses direct wording. Operating steps, six SK1 functions and steady panel height remain; radio programming behavior is unchanged.
 
 ⚠ **Experimental Software — Radio Damage Risk**
 
@@ -39,9 +41,9 @@ Programming errors, software defects, or interrupted communication may render yo
 
 ## Pending / limitations
 
-Physical-radio testing of this interface and other variants; protocol-level post-write session fix; cable transport; firmware flashing; banks/zones; blank-template radio-writing approval. The previous user-tested build worked on Radio 100 / V0.05 / V1.7, which does not certify other radios.
+Physical-radio testing of this interface and other variants; reception of dialed DTMF sequences; protocol-level post-write session fix; cable transport; firmware flashing; banks/zones; blank-template radio-writing approval. The previous hardware-tested build worked on Radio 100 / V0.05 / V1.7, which does not certify other radios.
 
-RepeaterBook approval, CORS/identification, per-user tokens, export/attribution permission and approved limits remain pending. See [integration review](docs/REPEATERBOOK.md).
+RepeaterBook approval, CORS/identification, individual app-bound tokens, export/attribution permission and approved limits remain pending. See [integration review](docs/REPEATERBOOK.md).
 
 Read [SAFETY.md](docs/SAFETY.md) before programming. Blank workspaces support editing/export; Bluetooth writing requires loaded CPS or radio settings. Every write programs the complete CPS configuration.
 
