@@ -14,6 +14,8 @@ Build 19.5 adds expandable feature guides on the editing screens and a Help walk
 
 Build 19.6 adds a simplified interactive Mini 5 button diagram in Radio & help. Hover, keyboard focus or tap shows a tutorial, labels fixed versus assignable controls, and explains the workspace side-key assignment. The diagram only displays instructions; it sends no radio commands.
 
+Build 19.7 expands the SK1 tutorial with all six supported programmable short-press assignments and their functions. The list uses the existing CPS option table; no assignments or radio behavior were added.
+
 ⚠ **Experimental Software — Radio Damage Risk**
 
 Programming errors, software defects, or interrupted communication may render your radio inoperable. Always maintain a backup dat for use with official CPS and programming cable.
