@@ -12,4 +12,5 @@ main{padding-top:12px}
 .workspace-head p{margin:0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .workspace-head .tag{display:inline-block}
 .session-bar{margin:8px 0 12px;padding:8px 12px}
+.credit-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-size:12px}
 @media(max-width:750px){.workspace-head{gap:8px}.workspace-head h2{font-size:19px}.workspace-head p{font-size:11px}.workspace-head .tag{font-size:10px;padding:4px 6px}}

@@ -8,6 +8,8 @@ Build 19.2 places the workspace title, description and source badge on one compa
 
 Build 19.3 adds Help guidance that only native CPS DAT files are supported and explains using the same file with stock Baofeng CPS/cable or this app/Bluetooth.
 
+Build 19.4 adds K4RJM's GitHub profile and QRZ callsign links below the developer credit. Both open in a new tab.
+
 ⚠ **Experimental Software — Radio Damage Risk**
 
 Programming errors, software defects, or interrupted communication may render your radio inoperable. Always maintain a backup dat for use with official CPS and programming cable.
