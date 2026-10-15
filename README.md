@@ -2,7 +2,7 @@
 
 Free, noncommercial browser software by K4RJM, hosted on GitHub Pages.
 
-**Current release: v20.11.** F02 now preserves the supported PTT delay, VFO PTT-ID and VFO squelch codes during radio decoding. Seven audit findings are corrected and eight remain open. F03 packing is unchanged pending unambiguous evidence. See the [remediation tracker](docs/AUDIT-REMEDIATION.md), [evidence review](docs/F02-F03-EVIDENCE-2026-10-15.md) and [verification](docs/VERIFICATION.md).
+**Current release: v20.12.** Channel frequencies no longer silently disappear at 600 MHz and above during decoding. Malformed or out-of-format channel frequencies are rejected; failed reads retain raw diagnostics and the previous workspace. This corrects F07's representation defect, not hardware band limits. Seven findings are corrected and eight remain open. F02 corrections are retained; F03 packing and Bluetooth transaction behavior are unchanged. See the [remediation tracker](docs/AUDIT-REMEDIATION.md), [F07 evidence and radio-test checklist](docs/F07-EVIDENCE-2026-10-15.md) and [verification](docs/VERIFICATION.md).
 
 [Open LIVE](https://k4rjm.github.io/baofeng-mini5-bt-cps-unofficial/) · [Open UAT for future development](https://k4rjm.github.io/baofeng-mini5-bt-cps-unofficial-uat/). The deployments use separate repositories; see [promotion and rollback](docs/DEPLOYMENT.md).
 
