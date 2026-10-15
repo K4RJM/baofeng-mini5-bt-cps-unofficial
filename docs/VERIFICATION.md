@@ -1,4 +1,18 @@
-# Build 19 verification — October 12, 2026
+# Verification status — v20.10, October 14, 2026
+
+The current release contains six audit corrections described in [AUDIT-REMEDIATION.md](AUDIT-REMEDIATION.md). Nine findings remain open. Automated results: **53 passing tests, 6 explicitly marked TODO failures, no unexpected failures**. The TODO cases reproduce unresolved radio findings; a successful CI exit does not close them.
+
+Private retained checks matched 1,042 native CPS frames (66,688 payload bytes), two decoder fixtures and native DAT round trips. These are finite historical comparisons. The decoder fixture generator includes hand-transcribed settings rules and is not an independent oracle for every field. No physical radio operation was performed for this release.
+
+All seven dialog heading references pass static validation. The local preview could not be reached from the in-app browser. Screen-reader testing remains pending. The original layout and styling are unchanged.
+
+Nine protected files are identical to retained build 18. DAT parsing has explicit resource limits, and encoder comments now describe the live write-plan usage. The manifest retains the old hashes and explains these two changes. Radio encoding logic, transport and memory map are unchanged.
+
+The sections below are historical records, not current release certification.
+
+---
+
+## Historical build 19 verification — October 12, 2026
 
 ## Automated checks
 

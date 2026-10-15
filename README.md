@@ -1,6 +1,12 @@
 # Baofeng Mini 5 BT CPS – Unofficial
 
-Free, noncommercial browser software by K4RJM, prepared for GitHub Pages. Build 19 replaces the placeholder with a single-screen editor, preserving the hardware-tested build 18 radio core unchanged.
+Free, noncommercial browser software by K4RJM, hosted on GitHub Pages.
+
+**Current release: v20.10.** Six audit findings are corrected: DAT resource limits, channel-only Undo, retained read diagnostics, unsaved-edit tracking, dialog names and verification documentation. Nine findings remain open. See the [remediation tracker](docs/AUDIT-REMEDIATION.md) and [current verification](docs/VERIFICATION.md).
+
+## Earlier releases
+
+Build 19 replaced the placeholder with a single-screen editor, preserving the retained build 18 radio core.
 
 Build 19.1 adds trailing-zero completion for edited channel/VFO frequencies: `146.52` becomes `146.52000` on leaving the field or applying/saving. Blank transmit fields remain blank, excess precision is rejected rather than rounded, and untouched imported values remain unchanged. All 28 tests pass; protected radio/codec/validation files remain unchanged.
 
@@ -40,7 +46,7 @@ Programming errors, software defects, or interrupted communication may render yo
 - Blank workspace, 999 editable channels, edit/delete/add-above, batch deletion with empty-slot/renumber choice, drag reorder, keyboard-accessible Move, search, pagination and channel-operation undo. The extra 1,000th file record is preserved.
 - Passive native CPS DAT import/export, original-read DAT backup, optional settings, upper/lower VFOs, DTMF and inherited validation/help.
 - Single Bluetooth session for connect/read/write/verify. Read loads the editor directly and retains the connection. Backup confirmation, model checks, failure lock and no automatic write retries.
-- Wireless CPS ON/scanning OFF preparation, manual CPS toggle after writing, and ten-minute idle warning with a 60-second disconnect countdown.
+- Wireless CPS ON/scanning OFF preparation, explicit restart confirmation after writing with a Wireless CPS toggle fallback, and ten-minute idle warning with a 60-second disconnect countdown.
 - Disabled RepeaterBook import preview, pending approval: no live API calls, token field, shared tokens or bundled data.
 
 ## Pending / limitations
@@ -70,12 +76,12 @@ Open `http://127.0.0.1:8726`. Serving is required for modules; double-clicking i
 
 Commit to `K4RJM/baofeng-mini5-bt-cps-unofficial`. In **Settings → Pages**, choose **GitHub Actions**. The workflow tests pull requests and deploys from main after passing tests and packaging. Only allowlisted public files are uploaded; tests, private DAT files and captures are excluded.
 
-Expected address after successful deployment: `https://k4rjm.github.io/baofeng-mini5-bt-cps-unofficial/`. This is not confirmation of deployment. No paid server, secret or shared token required. All assets use relative paths for repository-subpath hosting. `npm run package` prepares dist/.
+Live site: [Baofeng Mini 5 BT CPS – Unofficial](https://k4rjm.github.io/baofeng-mini5-bt-cps-unofficial/). A particular release is deployed only after its GitHub Actions run succeeds. No paid server, secret or shared token required. All assets use relative paths for repository-subpath hosting. `npm run package` prepares dist/.
 
 ## Verification and provenance
 
 `npm test` covers DAT round trips/rejection, channel preservation, writer/reader simulations, failure/no-retry behavior, decoder compatibility and protected-file hashes. Simulations are not hardware validation. See [verification notes](docs/VERIFICATION.md).
 
-Build 18 core SHA-256 hashes are tracked in docs/protected-core.json. Changes require explicit safety review and approval before use on a radio.
+Reviewed core SHA-256 hashes and the retained build 18 provenance are tracked in docs/protected-core.json. Changes require explicit safety review and approval before use on a radio.
 
 Derived from [Mini 5 Studio by replicationbench](https://github.com/replicationbench/Mini5); [CHIRP](https://github.com/kk7ds/chirp) informed the approved BLE layout and native CPS captures informed DAT mapping. Modified source and notices are supplied under GPL v3; see [LICENSE](LICENSE). Not affiliated with Baofeng or RepeaterBook.

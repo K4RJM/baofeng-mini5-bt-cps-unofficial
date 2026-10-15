@@ -6,11 +6,11 @@ Programming errors, software defects, or interrupted communication may render yo
 
 ## Preserved implementation
 
-The transport, native DAT codec, memory map, encoder, decoder, edit validator and option tables were copied without modification from retained build 18. `protected-core.json` records SHA-256 hashes; automated tests fail if any byte changes without review. No new protocol, wider address range, automatic write retry or speculative session-reset command was added.
+The radio transport, memory map, encoding logic, decoder, edit validator and option tables follow retained build 18. In v20.10 the DAT reader gains explicit resource limits and the encoder receives comment corrections; DAT export logic is unchanged. The six corrections and nine open findings are tracked in AUDIT-REMEDIATION.md. `protected-core.json` records SHA-256 hashes; automated tests fail if any byte changes without review. No new protocol, wider address range, automatic write retry or speculative session-reset command was added.
 
-The user reported a successful build 18 write and normal operation on Radio 100, firmware V0.05, hardware V1.7. The handshake verifies `5RMINI`, not firmware/hardware versions. Other variants are not verified. This interface has not received physical-radio testing.
+The maintainer reported a successful build 18 write and normal operation on Radio 100, firmware V0.05, hardware V1.7. The handshake verifies `5RMINI`, not firmware/hardware versions. Other variants are not verified. The v20.10 corrections have not received physical-radio testing.
 
-The preserved writer sends 262 sequential blocks with 128-byte payloads. The user's previously approved CHIRP method pads 8040–807F, 9040–907F and A1C0–A1FF with FF (192 bytes total). Wireless CPS at 9022 stays ON. Read-back compares 33,344 known CPS bytes; padding is not read or verified. DAT writes include all CPS channels, VFOs, optional settings and DTMF. They set unmapped bytes according to the retained encoder; a DAT is not a full memory-preserving backup.
+The preserved writer sends 262 sequential blocks with 128-byte payloads. The previously approved CHIRP method pads 8040–807F, 9040–907F and A1C0–A1FF with FF (192 bytes total). Wireless CPS at 9022 stays ON. Read-back compares 33,344 known CPS bytes; padding is not read or verified. DAT writes include all CPS channels, VFOs, optional settings and DTMF. They set unmapped bytes according to the retained encoder; a DAT is not a full memory-preserving backup.
 
 ## Operator flow
 
