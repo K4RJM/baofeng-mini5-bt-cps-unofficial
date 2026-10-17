@@ -20,7 +20,7 @@ const pageSize=50,tabs=['Channels','Repeater import','Optional settings','VFO A 
 const featureGuides={
  'Channels':{title:'How to edit and arrange channels',body:`<p><strong>Channels are saved radio memories.</strong> Start by opening a native CPS .dat or reading your radio. Changes here affect the workspace; they reach the radio only after an explicit Write radio action.</p>
 <ul><li><strong>Click a channel row</strong> to edit it, or focus the row and press Enter. Checkboxes and action buttons keep their own functions. Editing and deletion preserve your position in the list.</li>
-<li><strong>+ Add channel</strong> opens the first empty slot. Enter receive/transmit frequencies, tones and a name, then choose <strong>Apply channel edits</strong>. <strong>Previous / Next</strong> applies valid edits before moving through channel numbers, skipping empty slots unless Show empty slots is on. Navigation crosses table pages and ignores the search filter. Closing discards only the current staged edits; changes already applied remain in the workspace.</li>
+<li><strong>+ Add channel</strong> proposes the first empty slot but lets you edit <strong>Channel number</strong> to any empty slot from 1 to 999, even with Show empty slots off. Existing channels are never overwritten or renumbered. Slot 999 can be saved in a DAT; radio programming remains blocked until the F08 mapping is validated. Enter frequencies, tones and a name, then choose <strong>Apply channel edits</strong>. <strong>Previous / Next</strong> applies valid edits before moving through channel numbers, skipping empty slots unless Show empty slots is on. Navigation crosses table pages and ignores the search filter. Closing discards only the current staged edits; changes already applied remain in the workspace.</li>
 <li><strong>Add preset / Append .dat:</strong> load a radio read or native DAT first. Choose next available consecutive slots or an entirely empty numbered block. Preview placement; matching channels are skipped by default. Additions preserve current radio settings and support Undo. Programming still uses the separate full Write radio action.</li>
 <li><strong>Frequency entry:</strong> 146.52 becomes 146.52000 when you leave the field or apply. Channel RX/TX must use 136.00000–173.99875 or 400.00000–519.99875 MHz in 1.25 kHz steps. Off-grid values and extra decimal places are rejected rather than rounded. Preserve a blank transmit frequency when it is already disabled in your configuration.</li>
 <li><strong>RX tone</strong> controls tone filtering on reception; Off means no tone filter. <strong>TX tone</strong> is the tone sent with a transmission, such as the access tone supplied by a repeater operator. <strong>Include in scan</strong> includes or skips a memory; it does not start scanning.</li>
@@ -108,7 +108,7 @@ function renderChannels(c){
  const card=document.createElement('section');card.className='card';appendFeatureGuide(card,'Channels');const toolbar=document.createElement('div');toolbar.className='toolbar';const controls=document.createElement('div');controls.className='toolbar-controls';
  const input=document.createElement('input');input.type='search';input.placeholder='Search name, frequency, channel';input.setAttribute('aria-label','Search channels');input.value=search;input.oninput=()=>{const at=input.selectionStart;search=input.value;page=0;render();const next=$('channelSearch');next.focus();next.setSelectionRange(at,at);};input.id='channelSearch';controls.append(input);
  const emptyLabel=document.createElement('label');emptyLabel.className='check';const empty=document.createElement('input');empty.type='checkbox';empty.checked=showEmpty;empty.onchange=()=>{showEmpty=empty.checked;page=0;render();};emptyLabel.append(empty,'Show empty slots');controls.append(emptyLabel);toolbar.append(controls);
- const actions=document.createElement('div');actions.className='toolbar-controls';actions.append(btn('+ Add channel',()=>{const i=data.channelList[0].findIndex((ch,n)=>n<999&&!ch.rxFreq);if(i<0)throw Error('All 999 channels are in use.');edit(i);}),btn(`Delete selected (${selected.size})`,()=>deleteSelected(),'Choose whether to leave slots empty or renumber remaining channels'));
+ const actions=document.createElement('div');actions.className='toolbar-controls';actions.append(btn('+ Add channel',()=>{const i=data.channelList[0].findIndex((ch,n)=>n<999&&!ch.rxFreq);if(i<0)throw Error('All 999 channels are in use.');edit(i,false,true);}),btn(`Delete selected (${selected.size})`,()=>deleteSelected(),'Choose whether to leave slots empty or renumber remaining channels'));
  actions.lastChild.disabled=!selected.size;const undo=btn('Undo',()=>{const channels=history.pop();if(!channels)return;data.channelList[0].splice(0,999,...channels);selected.clear();changed();render();workspaceStatus();});undo.disabled=!history.length;actions.append(undo);const presets=btn('Add preset',()=>openAppend('preset')),appendDat=btn('Append .dat',()=>openAppend('dat'));presets.disabled=appendDat.disabled=!loadedSource;presets.title=appendDat.title=loadedSource?'Add channels without overwriting existing slots.':'Read your radio or open a native CPS .dat first.';actions.append(presets,appendDat);toolbar.append(actions);card.append(toolbar);
  const rows=filtered();page=Math.max(0,Math.min(page,Math.ceil(rows.length/pageSize)-1));const showing=rows.slice(page*pageSize,(page+1)*pageSize),wrap=document.createElement('div');wrap.className='table-wrap';wrap.id='channelTableWrap';wrap.dataset.view=JSON.stringify([search,showEmpty]);wrap.dataset.page=String(page);const table=document.createElement('table');table.innerHTML='<thead><tr><th><input id="selectPage" type="checkbox" aria-label="Select visible channels"></th><th>Ch</th><th>Name</th><th>Receive MHz</th><th>RX tone</th><th>Transmit MHz</th><th>TX tone</th><th>Scan</th><th>Actions</th></tr></thead>';
  const body=document.createElement('tbody');
@@ -127,40 +127,72 @@ function openAppend(mode){
   commit(candidate);search='';showEmpty=false;page=Math.floor(candidate.channelList[0].slice(0,plan.start-1).filter(c=>c.rxFreq).length/pageSize);render();workspaceStatus();message(plan.channels.length+(plan.channels.length===1?' channel':' channels')+' added to '+(plan.start===plan.end?plan.start:plan.start+'–'+plan.end)+'. Existing channels and radio settings preserved. Save a .dat copy or review before Write radio.');
  }});
 }
-function edit(i,insert=false){
- const view=captureChannelView();let copy,original,originalName;
+function edit(i,insert=false,chooseSlot=false){
+ const view=captureChannelView();let copy,original,originalName,slotInput;
  const adjacent=step=>{for(let n=i+step;n>=0&&n<999;n+=step)if(showEmpty||data.channelList[0][n].rxFreq)return n;return null;};
  function populate(){
-  copy=insert?emptyChannel():structuredClone(data.channelList[0][i]);original=structuredClone(copy);originalName=copy.name;
-  $('fields').replaceChildren();form(copy,$('fields'));$('editErrors').textContent='';
+  copy=insert||chooseSlot?emptyChannel():structuredClone(data.channelList[0][i]);original=structuredClone(copy);originalName=copy.name;
+  $('fields').replaceChildren();
+  if(chooseSlot){
+   const label=document.createElement('label'),hint=textEl('p','','muted');
+   slotInput=document.createElement('input');slotInput.id='channelNumberChoice';slotInput.type='number';
+   slotInput.min='1';slotInput.max='999';slotInput.step='1';slotInput.required=true;slotInput.value=String(i+1);
+   slotInput.setAttribute('aria-label','Channel number');
+   label.append(textEl('span','Channel number'),slotInput);
+   slotInput.oninput=()=>{
+    const value=slotInput.value.trim(),n=Number(value),valid=/^[1-9][0-9]{0,2}$/.test(value)&&n<=999;
+    $('editorTitle').textContent=valid?'Add channel '+n:'Add channel';
+    hint.textContent=!valid?'Enter a whole channel number from 1 to 999.'
+     :data.channelList[0][n-1].rxFreq?'Channel '+n+' is occupied. Choose an empty slot; existing channels will not be overwritten.'
+     :n===999?'Channel 999 can be saved in a DAT file. Radio writing remains blocked until F08 is resolved.'
+     :'This channel will be added directly to slot '+n+' without renumbering other channels.';
+   };
+   $('fields').append(label,hint);slotInput.oninput();
+  }
+  form(copy,$('fields'));$('editErrors').textContent='';
   const initial=[...$('fields').querySelectorAll('[data-key]')].map(input=>[input,input.value]);
-  stagedEdits=()=>$('editor').open&&initial.some(([input,value])=>input.value!==value);
+  stagedEdits=()=>$('editor').open&&(initial.some(([input,value])=>input.value!==value)||(chooseSlot&&slotInput.value!==String(i+1)));
   $('editorTitle').textContent=`${insert?'Add above channel':copy.rxFreq?'Edit channel':'Add channel'} ${i+1}`;
-  $('editorNavigation').hidden=insert;
+  $('editorNavigation').hidden=insert||chooseSlot;
   for(const [id,step]of [['editPrevious',-1],['editNext',1]]){
-   const next=adjacent(step);$(id).disabled=insert||next===null;
+   const next=adjacent(step);$(id).disabled=insert||chooseSlot||next===null;
    $(id).title=next===null?'No '+(step<0?'previous':'next')+' channel':'Apply edits and open channel '+(next+1);
   }
  }
  function apply(navigating=false){
   try{
    if([...$('fields').querySelectorAll('input')].some(el=>!el.reportValidity()))return false;
+   let destination=i;
+   if(chooseSlot){
+    const value=slotInput.value.trim(),n=Number(value);
+    if(!/^[1-9][0-9]{0,2}$/.test(value)||n>999)throw Error('Choose a whole channel number from 1 to 999.');
+    destination=n-1;
+    if(data.channelList[0][destination].rxFreq)throw Error('Channel '+n+' is already occupied. Choose an empty slot; existing channels are never overwritten.');
+   }
    for(const input of $('fields').querySelectorAll('[data-key]')){
     const k=input.dataset.key;if(isFrequencyField(k)&&input.value!==original[k])input.value=padFrequency(input.value);
     copy[k]=k==='name'?editedName(originalName,input.value):typeof copy[k]==='number'?Number(input.value):input.value;
    }
    const modified=JSON.stringify(copy)!==JSON.stringify(original);
    if(!copy.rxFreq&&(!navigating||modified))throw Error('Enter a receive frequency, or use Delete to clear this slot.');
-   if(modified||insert){
-    const candidate=insert?insertChannel(data,i,copy):structuredClone(data);if(!insert)candidate.channelList[0][i]=copy;
-    commit(candidate);workspaceStatus();
+   if(modified||insert||chooseSlot){
+    const candidate=insert?insertChannel(data,i,copy):structuredClone(data);
+    if(!insert)candidate.channelList[0][destination]=copy;
+    commit(candidate);
+    if(chooseSlot){
+     i=destination;search='';
+     page=Math.floor((showEmpty?i:data.channelList[0].slice(0,i).filter(ch=>ch.rxFreq).length)/pageSize);
+     render();
+    }
+    workspaceStatus();
+    if(chooseSlot&&i===998)message('Channel 999 saved in the workspace. Its radio-write guard remains active pending F08.');
    }
    return true;
   }catch(e){$('editErrors').textContent=e.message;return false;}
  }
  // Navigation applies the current edits; closing discards only the current staged edits.
  for(const [id,step]of [['editPrevious',-1],['editNext',1]])$(id).onclick=()=>{
-  if(insert)return;const next=adjacent(step);if(next===null||!apply(true))return;
+  if(insert||chooseSlot)return;const next=adjacent(step);if(next===null||!apply(true))return;
   i=next;populate();$(id).focus({preventScroll:true});
  };
  $('apply').onclick=()=>{if(apply()){$('editor').close();restoreChannelView(view,i);}};
