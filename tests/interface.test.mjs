@@ -1,3 +1,4 @@
+import {mountManuals} from '../help-manuals.mjs';
 import {inlineChannelEdit,planChannelMove,channelKeys} from '../channel-workspace.mjs';
 import {mountChannelCell} from '../channel-inline-ui.mjs';
 import {releaseAfterAcknowledgedWrite} from '../connection-recovery.mjs';
@@ -25,7 +26,7 @@ test('single-screen safety controls, read/write locks, reset prompt, idle timeou
  const get=id=>{if(!nodes.has(id))nodes.set(id,new Element(id));return nodes.get(id);};const doc={getElementById:get,createElement:tag=>new Element(tag),documentElement:new Element('html'),addEventListener(){}};
  globalThis.document=doc;const win={isSecureContext:true,scrollX:0,scrollY:0,scrollTo(x,y){this.scrollX=x;this.scrollY=y;},addEventListener(){}};let now=1000000,interval,download;
  const originalConnect=Writer.prototype.connect,connections=[];Writer.prototype.connect=async function(){const sim=simulatedRadio(this);connections.push(sim);};
- const ctx=vm.createContext({inlineChannelEdit,planChannelMove,channelKeys,mountChannelCell,document:doc,window:win,navigator:{bluetooth:{}},localStorage:{getItem(){},setItem(){}},structuredClone,Blob,Uint8Array,console,Date:{now:()=>now},URL:{createObjectURL(b){download=b;return 'mock';},revokeObjectURL(){}},setTimeout(){},setInterval(f){interval=f;},confirm:()=>true,fetch:async p=>({json:async()=>JSON.parse(fs.readFileSync(new URL('../'+p,import.meta.url)))}),readDat,readDatFile,writeDat,validateEdits,Writer,makePlan,verificationMessage,decodeRadio,radioDat,blankData,emptyChannel,removeChannels,insertChannel,moveChannel,configureFields,form,optionalForm,vfoForm,visibleName,visibleTone,editedName,isFrequencyField,padFrequency,renderRadioTutorial,openChannelAppend,releaseAfterAcknowledgedWrite});
+ const ctx=vm.createContext({inlineChannelEdit,planChannelMove,channelKeys,mountChannelCell,document:doc,window:win,navigator:{bluetooth:{}},localStorage:{getItem(){},setItem(){}},structuredClone,Blob,Uint8Array,console,Date:{now:()=>now},URL:{createObjectURL(b){download=b;return 'mock';},revokeObjectURL(){}},setTimeout(){},setInterval(f){interval=f;},confirm:()=>true,fetch:async p=>({json:async()=>JSON.parse(fs.readFileSync(new URL('../'+p,import.meta.url)))}),readDat,readDatFile,writeDat,validateEdits,Writer,makePlan,verificationMessage,decodeRadio,radioDat,blankData,emptyChannel,removeChannels,insertChannel,moveChannel,configureFields,form,optionalForm,vfoForm,visibleName,visibleTone,editedName,isFrequencyField,padFrequency,renderRadioTutorial,mountManuals,openChannelAppend,releaseAfterAcknowledgedWrite});
  try{
   const source=fs.readFileSync(new URL('../app.mjs',import.meta.url),'utf8').replace(/^import .*$/gm,'');await vm.runInContext('(async()=>{'+source+'})()',ctx);
   assert.equal(get('writeRadio').disabled,true);assert.equal(connections.length,0);
@@ -115,7 +116,7 @@ test('radio guide separates all six hold actions and retains DTMF transmission i
    star:['Key: *','Short Press – Reverse / Talkaround','Long Press – Keypad Lock',/Normal → Reverse \(R\) → Talkaround \(T\) → Normal/],
    '8':['Key: 8','Short Press – Numeric Entry','Long Press – Transmit Power',/Keeping 8 held does not continuously cycle power levels/],
    hash:['Key: #','Short Press – DTMF Dial','Long Press – Channel Scan',/Scan resume behavior/],
-   lamp:['Key: Flashlight / Search','Short Press – Flashlight','Long Press – Frequency Search (Nearby Signal Detection)',/not a spectrum analyzer or a conventional channel scanner/],
+   lamp:['Key: Flashlight / Search','Short Press – Flashlight','Long Press – Frequency Search (Nearby Signal Detection)',/Search detects nearby transmitting signals/],
    '0':['Key: 0','Short Press – Numeric Entry','Long Press – Weather',/weather-channel scanning/],
    menu:['Key: MENU','Short Press – Menu / Confirm','Long Press – Stopwatch',/Press MENU to start timing/]
   };
@@ -123,6 +124,8 @@ test('radio guide separates all six hold actions and retains DTMF transmission i
    select(key);assert.deepEqual(panel.querySelectorAll('h3').map(x=>x.textContent),[title]);assert.deepEqual(headings(),[short,long]);assert.match(textOf(panel),description);
    assert.ok(panel.querySelectorAll('h4').every(h=>h.className==='tutorial-action-title'));
   }
+  for(const [key,label,line]of [['ptta','PTT-A','upper (A)'],['pttb','PTT-B','lower (B)']]){select(key);assert.deepEqual(headings(),['Press and Hold — Transmit on '+label.at(-1)]);assert.deepEqual(panel.querySelectorAll('li').map(x=>x.textContent),[`Press and hold ${label} to transmit on the ${line} channel. Release the button to receive.`]);assert.equal(panel.querySelectorAll('p').length,0);}
+  assert.doesNotMatch(textOf(root),/The diagram explains the radio; it does not operate it/);
   select('hash');const dtmf=textOf(panel);
   assert.match(dtmf,/PTT exits the screen even if no digits were entered/);assert.match(dtmf,/EXIT does not cancel the screen/);assert.match(dtmf,/No method of exiting without transmitting has been confirmed/);
   assert.equal(panel.querySelectorAll('p').length,0);assert.doesNotMatch(dtmf,/FM.*station search/i);

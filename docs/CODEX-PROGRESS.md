@@ -1,16 +1,27 @@
+# Final UAT release gate — October 20, 2026
+
+UAT `31e2f03d5e940a55d4d95cb097c65aef691d24f9` (20.27) passed all 155 Node tests in Pages run 39367333045 and all 21 isolated browser checks. The final guide and official Baofeng manual link were verified. K4RJM explicitly authorizes LIVE promotion. LIVE rollback is `e61addc981f8336d591687acfb4fd93089924946` (20.26); pre-cleanup UAT rollback is `5abab1dd3da77b74fd031866caae49b4b7acf59a`. No physical-radio operations occurred. LIVE deployment and browser results will be recorded after publication.
+
+---
+
+# Current release checkpoint: 20.27 final cleanup
+
+Updated October 19, 2026. K4RJM explicitly authorizes LIVE promotion after final UAT verification. This supersedes historical UAT-only restrictions below for this release only.
+
+- UAT rollback: `5abab1dd3da77b74fd031866caae49b4b7acf59a`; LIVE rollback: `e61addc981f8336d591687acfb4fd93089924946` (20.26).
+- Completed: stable channel columns; compact 65/35 Help; all 23 blue-radio hotspots; concise PTT and other tutorials; meaningful DTMF/operating precautions retained; structured Testing & Compatibility; eight-page local Ham-Rx guide and PDF.js viewer with navigation, zoom, expansion, separate-tab link and download.
+- The manufacturer manual links to Baofeng’s official PDF, as requested on October 19; it is not redistributed. Existing physical testing is credited; no physical radio is accessed during this release.
+- 155 Node tests pass. The preceding UAT deployment passed all 21 isolated browser checks. Final candidate deployment checks and publication commits will be recorded below after verification.
+- Sixteen protected modules and the app radio-handler section are unchanged from 20.26. Bluetooth reconnection and accepted F01/F03 limitations remain unchanged.
+- Rollback by restoring the appropriate repository's recorded source tree in a new commit, then run its normal tests/deployment. Do not force-push or copy the UAT workflow to LIVE.
+
+---
+
 # Permanent project checkpoint
 
 Updated October 18, 2026. Resume here, then read AUDIT-REMEDIATION.md; inspect actual branch heads, tags and deployed versions before making changes. One finding/feature per version; no autonomous physical writes. Never repeat completed hardware tests or reopen an accepted limitation without new evidence.
 
-## LIVE promotion — v20.26 / authorized by K4RJM
-
-- K4RJM explicitly requested “make it live” after reviewing the verified UAT release. This supersedes the earlier UAT-only restriction for v20.26. Future development remains isolated in UAT.
-- Source: tested UAT application commit 166ab2a764ad7033a0dc9783b2a943b32e12a63e, documentation head 58dd683d8d11cce73134d7b63e7f516e5143526c. All executable modules, CSS, radio photo, favicon and tests are copied unchanged. Only release/environment wording is adjusted; LIVE keeps its existing deployment workflow and receives no UAT stamp script.
-- Verification before promotion: 154 automated tests and all 18 isolated UAT browser checks passed. LIVE deployment/browser confirmation will be recorded after publication.
-- LIVE rollback point: ac9a36403d4f2cfa74d075fc6c6f734146f1129f (v20.24). Restore this tree in a reviewed forward commit, retaining the normal test/deploy workflow. Do not force-push.
-- No physical radio access or writes. Existing protocol, writer, decoder/encoder, memory layout, final write validation and recovery behavior remain unchanged.
-
-## Historical verified UAT preview — v20.26 / inline channel workspace
+## Current verified UAT preview — v20.26 / inline channel workspace
 
 - Scope: UAT ONLY; LIVE must stay v20.24 at ac9a36403d4f2cfa74d075fc6c6f734146f1129f. K4RJM explicitly approved uploading after automated checks, followed by browser verification on UAT because the browser cannot reach localhost.
 - Starting/rollback commit: a17c2cc1a957c2d1e0d1cbab882dceca55d14745 (v20.25). Restore changed files in a forward commit and run the normal UAT workflow; do not force-push or touch LIVE.
