@@ -19,6 +19,7 @@ jobs:
           node-version: '22'
       - run: npm test
       - run: npm run package
+      - run: node scripts/stamp-uat.mjs --live
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
