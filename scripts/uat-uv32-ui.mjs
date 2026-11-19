@@ -15,6 +15,20 @@ export function installUv32Reader({radio,run,connect,message,refresh,renderMini5
  if([select,cableRead,cableWrite,view,save,cancel,importButton,importInput,output,...(bluetooth?bluetoothControls:[])].some(x=>!x))throw Error('UV-32 controls missing');
  let capture=null,preview=null,editedImage=null,controller=null,undo=[];
  let readBackup=null,fileOnly=false,datOnly=false,datTemplate=null;
+ let writeDevice=null;
+ const topConnect=$('connect');
+ const hasWriteConnection=()=>radio.connected&&writeDevice===radio.device;
+ if(bluetooth){
+  const defaultConnect=topConnect.onclick;
+  topConnect.onclick=()=>{
+   if(select.value!=='uv32')return defaultConnect();
+   if(hasWriteConnection()){
+    writeDevice=null;
+    return defaultConnect();
+   }
+   return run(async()=>{await connect();writeDevice=radio.device;});
+  };
+ }
  const channelOnly=()=>capture?.kind==='uv32-channel-read-v1';
  const originalImage=()=>channelOnly()?uv32ChannelCaptureImage(capture):uv32ImageFromHex(capture.wireHex);
  const workspace=createUv32Workspace({document:d,select,getCapture:()=>preview,canUndo:()=>undo.length>0,onUndo:()=>{
@@ -37,14 +51,15 @@ export function installUv32Reader({radio,run,connect,message,refresh,renderMini5
  const bluetoothWrite=bluetooth&&addFileButton('uatUv32BluetoothWrite','↑ Write UV-32 Bluetooth',cableWrite);
  const gpsWarning=bluetooth&&d.createElement('p');
  if(gpsWarning){
-  gpsWarning.className='muted';
+  gpsWarning.style.color='light-dark(#d00000, #ff4545)';
   gpsWarning.textContent='Turn GPS off on the UV-32 before reading or writing over Bluetooth.';
   gpsWarning.hidden=true;
   read.insertAdjacentElement('beforebegin',gpsWarning);
  }
  const blockedBluetoothWrite=()=>{
   if(!navigator.bluetooth||!window.isSecureContext)return 'Use a browser with Web Bluetooth.';
-  if(!(channelOnly()||capture?.readout)||!editedImage||fileOnly)return 'Read the UV-32 before writing.';
+  if(!hasWriteConnection())return 'Use Connect at the top before writing to the UV-32.';
+  if(!(channelOnly()||capture?.readout)||!editedImage)return 'Open a UV-32 file or read the radio before writing.';
   const blocks=changedUv32Blocks(originalImage(),editedImage);
   if(blocks.some(block=>block.address>=32000))return 'Use the cable to write changes to settings, VFO, DTMF, or zone names.';
   return '';
@@ -136,7 +151,7 @@ export function installUv32Reader({radio,run,connect,message,refresh,renderMini5
     }
     if(template)datTemplate=template;
     refresh();
-    note(fileOnly?'Opened UV-32 '+format+'. To program it, read the target radio first and import the file again.':'Imported UV-32 '+format+'. Write by cable to program the radio.');
+    note(fileOnly?'Opened UV-32 '+format+'. Use Bluetooth to write the channel table.':'Imported UV-32 '+format+'. Use the cable to program settings as well as channels.');
     return;
    }
    if(file.size>250000)throw Error('UV-32 capture is larger than expected');const loaded=openUv32Capture(await file.text());
@@ -175,18 +190,18 @@ export function installUv32Reader({radio,run,connect,message,refresh,renderMini5
   bluetoothWrite.onclick=()=>run(async()=>{
    const blocked=blockedBluetoothWrite();
    if(blocked)throw Error(blocked);
-   if(!changedUv32Blocks(originalImage(),editedImage).length){note('No channel changes to write. Edit a channel first.');return;}
    const baseline=capture,staged=editedImage;
    controller=new AbortController();
    note('Starting UV-32 Bluetooth channel write…');refresh();
    try{
-    await bluetooth.writeUv32Bluetooth(radio,baseline,staged,{
+    const report=await bluetooth.writeUv32Bluetooth(radio,baseline,staged,{
      signal:controller.signal,stage:note,
      progress:(stage,n,total)=>{const p=$('progress');p.max=total;p.value=n;note(`UV-32 Bluetooth ${stage}: block ${n}/${total}`);}
     });
     const updated={...baseline,...uv32Preview(staged),wireHex:uv32ImageToHex(staged)};
-    capture=channelOnly()?updated:openUv32Capture(updated);preview=capture;undo=[];
-    note('UV-32 Bluetooth write complete. All 500 channel blocks verified.');
+    capture=channelOnly()||fileOnly?updated:openUv32Capture(updated);preview=capture;undo=[];
+    const connection=report.reconnected?'Bluetooth connected.':'Use Connect at the top to reconnect.';
+    note(`UV-32 Bluetooth write verified. ${report.acknowledged} blocks acknowledged. ${connection}`);
     workspace.render();
    }catch(error){
     note(error.message);throw error;
@@ -207,8 +222,14 @@ export function installUv32Reader({radio,run,connect,message,refresh,renderMini5
   finally{controller=null;refresh();}
   });
  };
- select.addEventListener('change',()=>{if(select.value==='uv32'){workspace.reset();refresh();note('UV-32 · Ready to read or open a capture');}else{workspace.restoreBrand();renderMini5();refresh();workspaceStatus();}});
+ select.addEventListener('change',()=>{
+  writeDevice=null;
+  if(bluetooth&&radio.connected)radio.disconnect();
+  if(select.value==='uv32'){workspace.reset();refresh();note('UV-32 · Ready to read or open a capture');}
+  else{workspace.restoreBrand();renderMini5();refresh();workspaceStatus();}
+ });
  return {openHelp(){if(select.value!=='uv32')return false;workspace.openHelp();return true;},sync(busy){const uv=select.value==='uv32';
+  if(!radio.connected&&!controller)writeDevice=null;
   for(const id of ['uatUv32CableRead','uatUv32CableWrite','uatUv32View','uatUv32Save','uatUv32Import'])$(id).hidden=!uv;
   view.hidden=true;
   for(const button of [appendFile,saveDat,backupFile])button.hidden=!uv;
@@ -221,8 +242,9 @@ export function installUv32Reader({radio,run,connect,message,refresh,renderMini5
    gpsWarning.hidden=!uv;
    const writeBlocked=uv?blockedBluetoothWrite():'';
    bluetoothWrite.hidden=!uv;
+   if(uv&&!hasWriteConnection())topConnect.textContent='Connect';
    bluetoothWrite.disabled=busy||!!writeBlocked;
-   bluetoothWrite.title=writeBlocked||'Write changed channel blocks over Bluetooth and verify all channels afterward.';
+   bluetoothWrite.title=writeBlocked||'Write the channel table over Bluetooth and verify it afterward.';
   }
   for(const id of ['open','appendChannels','save','saveImg','readRadio','writeRadio','readMini5Cable','writeMini5Cable','verify','backup'])$(id).hidden=uv;
   select.disabled=busy;importButton.disabled=busy;
