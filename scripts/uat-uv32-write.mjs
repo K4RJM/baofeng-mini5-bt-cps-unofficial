@@ -1,6 +1,6 @@
 // UV32PRO Bluetooth writes use the frame and chunk sizes observed in OLA.
 import {identifyProfile,consumeUv32ReadSession} from './uat-protocols.mjs?v=20.46';
-import {captureUv32Channels} from './uat-uv32-read.mjs';
+import {captureUv32Channels,finishUv32Session} from './uat-uv32-read.mjs';
 import {changedUv32Blocks,uv32ChannelCaptureImage,uv32ImageFromHex,uv32ImageToHex} from './uat-uv32-edit.mjs';
 import {openUv32Capture} from './uat-uv32-capture.mjs';
 import {UV32_RECORD_BYTES,UV32_CHANNEL_BYTES,uv32WireDecode} from './uv32-codec.mjs';
@@ -90,11 +90,6 @@ export async function writeUv32Bluetooth(radio,baseline,editedImage,{
  }
  try{
   checkCancelled();
-  if(baseline.handshake){
-   stage('Reconnecting to the UV-32 for writing…');
-   await reconnect();
-  }
-  checkCancelled();
   report.stage='identifying';
   stage('Identifying UV-32 for writing…');
   const identity=await identifyProfile(radio,'uv32',{sendMode:'without-response',writeSession:true});
@@ -135,9 +130,7 @@ export async function writeUv32Bluetooth(radio,baseline,editedImage,{
   stage('Closing the UV-32 programming session…');
   try{
    check();
-   await radio.native('Finishing UV-32 programming',()=>characteristic.writeValueWithoutResponse(Uint8Array.of(0x45)),radio.deadlines.send);
-   const [end]=await radio.wait(1);
-   if(end!==0x06&&(end!==0xff||(await radio.wait(1))[0]!==0x00))throw Error('UV-32 did not confirm the end of programming');
+   await finishUv32Session(radio,'write');
   }catch(error){
    checkCancelled();
    if(radio.connected)throw error;
@@ -151,9 +144,11 @@ export async function writeUv32Bluetooth(radio,baseline,editedImage,{
   });
   if(identityKey(after.handshake)!==identityKey(identity)||!channelsMatch(expected,after.wireHex))throw Error('Bluetooth read-back differs from the edited channel data');
   report.verified=true;
-  stage('Restoring the UV-32 Bluetooth connection…');
-  try{await reconnect();}
-  catch(error){report.connectionError=error.message;}
+  if(!radio.connected){
+   stage('Restoring the UV-32 Bluetooth connection…');
+   try{await reconnect();}
+   catch(error){report.connectionError=error.message;}
+  }
   report.reconnected=radio.connected&&!report.connectionError;
   report.stage='complete';
   return report;

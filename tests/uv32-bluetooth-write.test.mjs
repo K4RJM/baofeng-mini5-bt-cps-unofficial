@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {Reader} from '../read-test/reader.mjs';
+import {captureUv32Channels} from '../scripts/uat-uv32-read.mjs';
 import {writeUv32Bluetooth} from '../scripts/uat-uv32-write.mjs';
 import {editUv32Channel,uv32ChannelCaptureImage,uv32ImageFromHex,uv32Preview,uv32ImageToHex} from '../scripts/uat-uv32-edit.mjs';
 import {asyncRadio} from './async-radio.mjs';
@@ -43,7 +44,7 @@ test('Bluetooth starts at zero and writes the channel table even when the only e
   assert.equal(fake.reads,500);
   assert.equal(fake.writes,250);
   assert.equal(fake.events.filter(event=>event==='chooser').length,1);
-  assert.equal(fake.events.filter(event=>event==='connect').length,3);
+  assert.equal(fake.events.filter(event=>event==='connect').length,1);
   assert.equal(radio.connected,true);
   assert.equal(report.reconnected,true);
   assert.equal(fake.sent.find(command=>[0x52,0x57].includes(command[0]))[0],0x57);
@@ -69,7 +70,7 @@ test('Bluetooth starts at zero and writes the channel table even when the only e
   assert.equal(fake.sent.slice(0,end).filter(frame=>frame[0]===0x57).length,250);
   assert.equal(fake.sent.findIndex(frame=>frame[0]===0x52)>end,true);
   assert.deepEqual(fake.packets.slice(0,5).map(packet=>packet.length),[16,1,1,16,9]);
-  assert.equal(fake.events.slice(0,fake.events.indexOf('disconnect')).includes('send-with-response'),false);
+  assert.equal(fake.events.slice(0,fake.events.indexOf('bridge-setup',fake.events.indexOf('bridge-setup')+1)).includes('send-with-response'),false);
  });
 });
 
@@ -164,5 +165,23 @@ test('An acknowledged write with a differing read-back is never reported as veri
   });
   assert.equal(fake.writes,250);
   assert.equal(fake.reads,500);
+ });
+});
+
+test('Top Connect, Read, then Write uses one Bluetooth connection through verification',async t=>{
+ await withRadio(t,{},async(radio,fake)=>{
+  const generation=radio.generation;
+  const read=await captureUv32Channels(radio,{connect:()=>assert.fail('Already connected')});
+  assert.equal(read.closeError,undefined);
+  assert.equal(fake.sent.at(-1)[0],0x45);
+  const start=fake.sent.length;
+  const report=await writeUv32Bluetooth(radio,read,uv32ChannelCaptureImage(read));
+  assert.deepEqual(fake.sent.slice(start,start+5).map(command=>command[0]),[0x50,0x46,0x4d,0x53,0x57]);
+  assert.equal(report.verified,true);
+  assert.equal(fake.writes,250);
+  assert.equal(fake.reads,1000);
+  assert.equal(fake.events.filter(event=>event==='chooser').length,1);
+  assert.equal(fake.events.includes('disconnect'),false);
+  assert.equal(radio.generation,generation);
  });
 });

@@ -46,8 +46,8 @@ export function installUv32Reader({radio,run,connect,message,refresh,renderMini5
   const button=d.createElement('button');button.type='button';button.id=id;button.textContent=label;button.hidden=true;
   before.insertAdjacentElement('beforebegin',button);return button;
  };
- const appendFile=addFileButton('uv32AppendFile','＋ Append channels',cableRead);
- const saveDat=addFileButton('uv32SaveDat','↧ Save .dat copy',cableRead);
+ const appendFile=addFileButton('uv32AppendFile','＋ Append channels',read);
+ const saveDat=addFileButton('uv32SaveDat','↧ Save .dat copy',read);
  const bluetoothWrite=bluetooth&&addFileButton('uatUv32BluetoothWrite','↑ Write UV-32 Bluetooth',cableWrite);
  const gpsWarning=bluetooth&&d.createElement('p');
  if(gpsWarning){
@@ -90,7 +90,7 @@ export function installUv32Reader({radio,run,connect,message,refresh,renderMini5
   try{const template=await loadDat(file);if(select.value!=='uv32')return;exportDat(template);datTemplate=template;}
   catch(error){note(error.message);}
  };
- cableRead.insertAdjacentElement('beforebegin',save);
+ (gpsWarning||read).insertAdjacentElement('beforebegin',save);
  const backupFile=addFileButton('uv32ReadBackup','↧ Save read backup',view);
  backupFile.onclick=()=>{if(readBackup)exportImage(readBackup,'uv32-original-radio-backup.img');};
  const stageImage=(next,keepUndo=true)=>{
@@ -172,7 +172,7 @@ export function installUv32Reader({radio,run,connect,message,refresh,renderMini5
     progress:(n,total)=>{const p=$('progress');p.max=total;p.value=n;note(`Reading UV-32 channels · block ${n}/${total}`);}
    });
    editedImage=uv32ChannelCaptureImage(result);capture=result;preview=result;fileOnly=false;datOnly=false;undo=[];
-   workspace.reset();note('UV-32 read complete. Edit channels, then choose Write UV-32 Bluetooth.');
+   workspace.reset();note(radio.connected?'UV-32 channel read complete.':'UV-32 channel read complete. Use Connect at the top to reconnect.');
   }catch(error){note(error.message);throw error;}
   finally{controller=null;refresh();}
  });
