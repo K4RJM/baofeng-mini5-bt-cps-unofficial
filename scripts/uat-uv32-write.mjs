@@ -162,7 +162,10 @@ export async function writeUv32Bluetooth(radio,baseline,editedImage,{
   report.error=detail;
   if(error?.uv32ReadReport)report.read=error.uv32ReadReport;
   let context='No blocks sent.';
-  if(report.attemptedAddress!==null){
+  if(report.acknowledged===report.totalBlocks){
+   context=`All ${report.totalBlocks} write blocks acknowledged. Read-back was not verified.`;
+   if(!radio.connected)context+=' Use Connect to reconnect.';
+  }else if(report.attemptedAddress!==null){
    const address=report.attemptedAddress.toString(16).padStart(4,'0').toUpperCase();
    context=`${report.acknowledged}/${report.totalBlocks} blocks acknowledged, last attempted 0x${address}.`;
   }

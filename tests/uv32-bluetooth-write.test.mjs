@@ -156,6 +156,8 @@ test('An acknowledged write with a differing read-back is never reported as veri
    progress:(stage,n)=>{if(stage==='Writing channels'&&n===250)fake.raw[64]^=1;}
   }),error=>{
    assert.match(error.message,/read-back differs/);
+   assert.match(error.message,/All 250 write blocks acknowledged\. Read-back was not verified\./);
+   assert.doesNotMatch(error.message,/last attempted/);
    assert.equal(error.uv32BluetoothWriteReport.acknowledged,250);
    assert.equal(error.uv32BluetoothWriteReport.verified,false);
    return true;
